@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE GaitSym2017Preferences>
+<PREFERENCES>
+<SETTING order="-1" type="QString" path="0" display="0" label="Application" key="Application" value="GaitSym2017" defaultValue="GaitSym2017"/>
+<SETTING order="=1" type="QString" path="0" display="0" label="Organisation" key="Organisation" value="AnimalSimulationLaboratory" defaultValue="AnimalSimulationLaboratory"/>
+<SETTING order="-1" type="QString" path="0" display="0" label="SettingsCode" key="SettingsCode" value="9047402569010792" defaultValue="9047402569010792"/>
+<SETTING order="-1" type="QString" path="0" display="0" label="" key="LastExportedFile" value="D:/Scratch/Defaults.xml" defaultValue=""/>
+<SETTING order="-1" type="QString" path="0" display="0" label="LastFileOpened" key="LastFileOpened" value="" defaultValue=""/>
+<SETTING order="-1" type="QByteArray" path="0" display="0" label="" key="MainWindowGeometry" value="" defaultValue=""/>
+<SETTING order="-1" type="QByteArray" path="0" display="0" label="" key="MainWindowState" value="" defaultValue=""/>
+<SETTING order="-1" type="QByteArray" path="0" display="0" label="" key="SplitterState" value="" defaultValue=""/>
+
+<SETTING order="0" type="QString" path="1" display="1" label="GraphicsPath" key="GraphicsPath" value="" defaultValue=""/>
+<SETTING order="0" type="int" path="0" display="1" label="MovieFormat" key="MovieFormat" value="0" defaultValue="0"/>
+<SETTING order="0" type="int" path="0" display="1" label="MovieFramerate" key="MovieFramerate" value="25" defaultValue="25"/>
+<SETTING order="0" type="QString" path="1" display="1" label="MoviePath" key="MoviePath" value="Movie" defaultValue="Movie"/>
+<SETTING order="0" type="int" path="0" display="1" label="MovieSkip" key="MovieSkip" value="100" defaultValue="100"/>
+<SETTING order="0" type="int" path="0" display="1" label="OpenGLMultisample" key="OpenGLMultisample" value="8" defaultValue="8"/>
+<SETTING order="0" type="bool" path="0" display="1" label="OrthographicFlag" key="OrthographicFlag" value="true" defaultValue="true"/>
+
+<SETTING order="1" type="double" path="0" display="1" label="DefaultCameraBackClip" key="DefaultCameraBackClip" value="100" defaultValue="100"/>
+<SETTING order="1" type="double" path="0" display="1" label="DefaultCameraCOIX" key="DefaultCameraCOIX" value="0" defaultValue="0"/>
+<SETTING order="1" type="double" path="0" display="1" label="DefaultCameraCOIY" key="DefaultCameraCOIY" value="0" defaultValue="0"/>
+<SETTING order="1" type="double" path="0" display="1" label="DefaultCameraCOIZ" key="DefaultCameraCOIZ" value="0" defaultValue="0"/>
+<SETTING order="1" type="double" path="0" display="1" label="DefaultCameraDistance" key="DefaultCameraDistance" value="50" defaultValue="50"/>
+<SETTING order="1" type="double" path="0" display="1" label="DefaultCameraFoV" key="DefaultCameraFoV" value="5" defaultValue="5"/>
+<SETTING order="1" type="double" path="0" display="1" label="DefaultCameraFrontClip" key="DefaultCameraFrontClip" value="1" defaultValue="1"/>
+<SETTING order="1" type="double" path="0" display="1" label="DefaultCameraUpX" key="DefaultCameraUpX" value="0" defaultValue="0"/>
+<SETTING order="1" type="double" path="0" display="1" label="DefaultCameraUpY" key="DefaultCameraUpY" value="0" defaultValue="0"/>
+<SETTING order="1" type="double" path="0" display="1" label="DefaultCameraUpZ" key="DefaultCameraUpZ" value="1" defaultValue="1"/>
+<SETTING order="1" type="double" path="0" display="1" label="DefaultCameraVecX" key="DefaultCameraVecX" value="0" defaultValue="0"/>
+<SETTING order="1" type="double" path="0" display="1" label="DefaultCameraVecY" key="DefaultCameraVecY" value="1" defaultValue="1"/>
+<SETTING order="1" type="double" path="0" display="1" label="DefaultCameraVecZ" key="DefaultCameraVecZ" value="0" defaultValue="0"/>
+<SETTING order="1" type="double" path="0" display="1" label="DefaultTrackingOffset" key="DefaultTrackingOffset" value="0" defaultValue="0"/>
+
+<SETTING order="2" type="double" path="0" display="1" label="CameraBackClip" key="CameraBackClip" value="100" defaultValue="100"/>
+<SETTING order="2" type="double" path="0" display="1" label="CameraCOIX" key="CameraCOIX" value="0" defaultValue="0"/>
+<SETTING order="2" type="double" path="0" display="1" label="CameraCOIY" key="CameraCOIY" value="0" defaultValue="0"/>
+<SETTING order="2" type="double" path="0" display="1" label="CameraCOIZ" key="CameraCOIZ" value="0" defaultValue="0"/>
+<SETTING order="2" type="double" path="0" display="1" label="CameraDistance" key="CameraDistance" value="50" defaultValue="50"/>
+<SETTING order="2" type="double" path="0" display="1" label="CameraFoV" key="CameraFoV" value="5" defaultValue="5"/>
+<SETTING order="2" type="double" path="0" display="1" label="CameraFrontClip" key="CameraFrontClip" value="1" defaultValue="1"/>
+<SETTING order="2" type="double" path="0" display="1" label="CameraUpX" key="CameraUpX" value="0" defaultValue="0"/>
+<SETTING order="2" type="double" path="0" display="1" label="CameraUpY" key="CameraUpY" value="0" defaultValue="0"/>
+<SETTING order="2" type="double" path="0" display="1" label="CameraUpZ" key="CameraUpZ" value="1" defaultValue="1"/>
+<SETTING order="2" type="double" path="0" display="1" label="CameraVecX" key="CameraVecX" value="0" defaultValue="0"/>
+<SETTING order="2" type="double" path="0" display="1" label="CameraVecY" key="CameraVecY" value="1" defaultValue="1"/>
+<SETTING order="2" type="double" path="0" display="1" label="CameraVecZ" key="CameraVecZ" value="0" defaultValue="0"/>
+
+<SETTING order="3" type="QColor" path="0" display="1" label="CursorColour" key="CursorColour" value="#f0f0f0ff" defaultValue="#f0f0f0ff"/>
+<SETTING order="3" type="double" path="0" display="1" label="CursorRadius" key="CursorRadius" value="0.005" defaultValue="0.005"/>
+<SETTING order="3" type="double" path="0" display="1" label="Nudge" key="Nudge" value="0.005" defaultValue="0.005"/>
+<SETTING order="3" type="bool" path="0" display="1" label="DisplayActivation" key="DisplayActivation" value="false" defaultValue="false"/>
+<SETTING order="3" type="bool" path="0" display="1" label="DisplayContactForces" key="DisplayContactForces" value="false" defaultValue="false"/>
+<SETTING order="3" type="bool" path="0" display="1" label="DisplayMuscleForces" key="DisplayMuscleForces" value="false" defaultValue="false"/>
+<SETTING order="3" type="int" path="0" display="1" label="FrameSkip" key="FrameSkip" value="1000" defaultValue="1000"/>
+<SETTING order="3" type="QString" path="0" display="1" label="TrackBodyID" key="TrackBodyID" value="Trunk" defaultValue="Trunk"/>
+<SETTING order="3" type="bool" path="0" display="1" label="TrackingFlag" key="TrackingFlag" value="false" defaultValue="false"/>
+<SETTING order="3" type="double" path="0" display="1" label="TrackingOffset" key="TrackingOffset" value="0" defaultValue="0"/>
+
+<SETTING order="4" type="QColor" path="0" display="1" label="BackgroundColour" key="BackgroundColour" value="#ffffffff" defaultValue="#ffffffff"/>
+<SETTING order="4" type="double" path="0" display="1" label="BodyAxesSize" key="BodyAxesSize" value="0.1" defaultValue="0.1"/>
+<SETTING order="4" type="QColor" path="0" display="1" label="BodyColour" key="BodyColour" value="#ff00ff00" defaultValue="#ff00ff00"/>
+<SETTING order="4" type="QColor" path="0" display="1" label="DataTargetColour" key="DataTargetColour" value="#ffff0080" defaultValue="#ffff0080"/>
+<SETTING order="4" type="double" path="0" display="1" label="DataTargetRadius" key="DataTargetRadius" value="0.005" defaultValue="0.005"/>
+<SETTING order="4" type="QColor" path="0" display="1" label="EnvironmentAxesColour" key="EnvironmentAxesColour" value="#ff00ffff" defaultValue="#ff00ffff"/>
+<SETTING order="4" type="double" path="0" display="1" label="EnvironmentAxesSize" key="EnvironmentAxesSize" value="1" defaultValue="1"/>
+<SETTING order="4" type="double" path="0" display="1" label="GeomAxesSize" key="GeomAxesSize" value="0.1" defaultValue="0.1"/>
+<SETTING order="4" type="QColor" path="0" display="1" label="GeomColour" key="GeomColour" value="#ffffff00" defaultValue="#ffffff00"/>
+<SETTING order="4" type="QColor" path="0" display="1" label="ContactForceColour" key="GeomForceColour" value="#ffffff00" defaultValue="#ffffff00"/>
+<SETTING order="4" type="double" path="0" display="1" label="ContactForceRadius" key="GeomForceRadius" value="0.01" defaultValue="0.01"/>
+<SETTING order="4" type="double" path="0" display="1" label="ContactForceScale" key="GeomForceScale" value="1e-5" defaultValue="1e-5"/>
+<SETTING order="4" type="double" path="0" display="1" label="JointAxesSize" key="JointAxesSize" value="0.05" defaultValue="0.05"/>
+<SETTING order="4" type="QColor" path="0" display="1" label="JointColour" key="JointColour" value="#ff0000ff" defaultValue="#ff0000ff"/>
+<SETTING order="4" type="QColor" path="0" display="1" label="MarkerColour" key="MarkerColour" value="#ffff8000" defaultValue="#ffff8000"/>
+<SETTING order="4" type="double" path="0" display="1" label="MarkerRadius" key="MarkerRadius" value="0.005" defaultValue="0.005"/>
+<SETTING order="4" type="QColor" path="0" display="1" label="ReporterColour" key="ReporterColour" value="#ffff8000" defaultValue="#ffff8000"/>
+<SETTING order="4" type="double" path="0" display="1" label="ReporterRadius" key="ReporterRadius" value="0.005" defaultValue="0.005"/>
+<SETTING order="4" type="QColor" path="0" display="1" label="StrapColour" key="StrapColour" value="#ffff0000" defaultValue="#ffff0000"/>
+<SETTING order="4" type="QColor" path="0" display="1" label="StrapCylinderColour" key="StrapCylinderColour" value="#ffff00ff" defaultValue="#ffff00ff"/>
+<SETTING order="4" type="double" path="0" display="1" label="StrapCylinderLength" key="StrapCylinderLength" value="0.04" defaultValue="0.04"/>
+<SETTING order="4" type="QColor" path="0" display="1" label="StrapForceColour" key="StrapForceColour" value="#ffff0000" defaultValue="#ffff0000"/>
+<SETTING order="4" type="double" path="0" display="1" label="StrapForceRadius" key="StrapForceRadius" value="0.01" defaultValue="0.01"/>
+<SETTING order="4" type="double" path="0" display="1" label="StrapForceScale" key="StrapForceScale" value="1e-5" defaultValue="1e-5"/>
+<SETTING order="4" type="double" path="0" display="1" label="StrapRadius" key="StrapRadius" value="0.005" defaultValue="0.005"/>
+</PREFERENCES>

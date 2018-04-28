@@ -1,0 +1,8 @@
+<GAITSYMODE>
+<STATE SimulationTime="0" />
+  <IOCONTROL OldStyleInputs="false" SanityCheckAxis="Y" SanityCheckLeft="" SanityCheckRight="" />
+  <GLOBAL AllowInternalCollisions="false" BMR="0" CFM="1e-10" ContactMaxCorrectingVel="100" ContactSurfaceLayer="0.001" DistanceTravelledBodyID="Body0" ERP="0.2" FitnessType="DistanceTravelled" GravityVector="0.0 0.0 -9.81" IntegrationStepSize="1e-4" MechanicalEnergyLimit="0" MetabolicEnergyLimit="0" TimeLimit="3" />
+  <INTERFACE BodyAxisSize="0.1 0.1 0.1" BodyColour=".275 .725 .451 1.0" DrawingOrder="Environment Joint Muscle Geom Body" EnvironmentAxisSize="1 1 1" EnvironmentColour="0.5 0.5 1.0 1.0" GeomColour="0 0 1 1" JointAxisSize="0.05 0.05 0.05" JointColour="0 1 0 1" StrapColour="1 0 0 1" StrapCylinderColour="0 1 1 1" StrapCylinderLength="0.05" StrapForceColour="1 0 0 0.5" StrapForceRadius="0.01" StrapForceScale="0.000001" StrapRadius="0.005" TrackBodyID="Body0" />
+  <ENVIRONMENT Plane="0 0 1 0" />
+BODY_BOOKMARK
+</GAITSYMODE>

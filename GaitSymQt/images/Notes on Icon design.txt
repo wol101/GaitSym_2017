@@ -1,0 +1,8 @@
+Notes on Icon Design
+
+Scale by 400% from the SVG icon.
+
+Use media box to get the 1024x1024 image in photoshop.
+
+Type in view buttons is Nanum Gothic Bold (converted to outlines so it centres properly).
+

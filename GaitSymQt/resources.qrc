@@ -1,0 +1,58 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+<qresource>
+<file>images/Desktop Icon/Icon Art (1024x1024 media box).png</file>
+<file>images/Desktop Icon/Icon.iconset/icon_128x128.png</file>
+<file>images/Desktop Icon/Icon.iconset/icon_128x128@2x.png</file>
+<file>images/Desktop Icon/Icon.iconset/icon_16x16.png</file>
+<file>images/Desktop Icon/Icon.iconset/icon_16x16@2x.png</file>
+<file>images/Desktop Icon/Icon.iconset/icon_256x256.png</file>
+<file>images/Desktop Icon/Icon.iconset/icon_256x256@2x.png</file>
+<file>images/Desktop Icon/Icon.iconset/icon_32x32.png</file>
+<file>images/Desktop Icon/Icon.iconset/icon_32x32@2x.png</file>
+<file>images/Desktop Icon/Icon.iconset/icon_512x512.png</file>
+<file>images/Desktop Icon/Icon.iconset/icon_512x512@2x.png</file>
+<file>images/Desktop Icon/Side View Chimpanzee.png</file>
+<file>images/Load Model Icon/Load Model Icon 1024x1024.png</file>
+<file>images/Load Model Icon/Load Model Icon 32x32.png</file>
+<file>images/Media Control Icons/Record Icon 1024x1024.png</file>
+<file>images/Media Control Icons/Record Icon 32x32.png</file>
+<file>images/Media Control Icons/Restart Icon 1024x1024.png</file>
+<file>images/Media Control Icons/Restart Icon 32x32.png</file>
+<file>images/Media Control Icons/Run Icon 1024x1024.png</file>
+<file>images/Media Control Icons/Run Icon 32x32.png</file>
+<file>images/Media Control Icons/Step Forward Icon 1024x1024.png</file>
+<file>images/Media Control Icons/Step Forward Icon 32x32.png</file>
+<file>images/New Model Icon/New Model Icon 1024x1024.png</file>
+<file>images/New Model Icon/New Model Icon 32x32.png</file>
+<file>images/Save As Icon/Save As Icon 1024x1024.png</file>
+<file>images/Save As Icon/Save As Icon 32x32.png</file>
+<file>images/Snapshot Icon/Snapshot Icon 1024x1024.png</file>
+<file>images/Snapshot Icon/Snapshot Icon 32x32.png</file>
+<file>images/View Direction Icons/View Direction Back 32x32.png</file>
+<file>images/View Direction Icons/View Direction Back.png</file>
+<file>images/View Direction Icons/View Direction Bottom 32x32.png</file>
+<file>images/View Direction Icons/View Direction Bottom.png</file>
+<file>images/View Direction Icons/View Direction Front 32x32.png</file>
+<file>images/View Direction Icons/View Direction Front.png</file>
+<file>images/View Direction Icons/View Direction Left 32x32.png</file>
+<file>images/View Direction Icons/View Direction Left.png</file>
+<file>images/View Direction Icons/View Direction Right 32x32.png</file>
+<file>images/View Direction Icons/View Direction Right.png</file>
+<file>images/View Direction Icons/View Direction Top 32x32.png</file>
+<file>images/View Direction Icons/View Direction Top.png</file>
+<file>images/Floor Textures/floor_checker_1.png</file>
+<file>images/Floor Textures/floor_checker_2.png</file>
+<file>ViewControlWidget Images/Blob.png</file>
+<file>ViewControlWidget Images/SideBySide.png</file>
+<file>ViewControlWidget Images/SideViewPoints.png</file>
+<file>ViewControlWidget Images/TopViewPoints.png</file>
+<file>templates/NewConfigFileTemplate.xml</file>
+<file>templates/BodyTemplate.xml</file>
+<file>opengl/fragment_shader.glsl</file>
+<file>opengl/vertex_shader.glsl</file>
+<file>opengl/fragment_shader_2.glsl</file>
+<file>opengl/vertex_shader_2.glsl</file>
+<file>preferences/default_values.xml</file>
+</qresource>
+</RCC>
