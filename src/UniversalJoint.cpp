@@ -30,7 +30,7 @@
 
 UniversalJoint::UniversalJoint(dWorldID worldID) : Joint()
 {
-    m_JointID = dJointCreateHinge2(worldID, 0);
+    m_JointID = dJointCreateUniversal(worldID, 0);
     dJointSetData(m_JointID, this);
 
     dJointSetFeedback(m_JointID, &m_JointFeedback);
@@ -41,7 +41,7 @@ UniversalJoint::UniversalJoint(dWorldID worldID) : Joint()
 
 void UniversalJoint::SetUniversalAnchor (double x, double y, double z)
 {
-    dJointSetHinge2Anchor(m_JointID, x, y, z);
+    dJointSetUniversalAnchor (m_JointID, x, y, z);
 }
 
 // parses the position allowing a relative position specified by BODY ID
@@ -101,7 +101,7 @@ void UniversalJoint::SetUniversalAxis1(double x, double y, double z)
     dVector3 v;
     v[0] = x; v[1] = y; v[2] = z;
     dNormalize3(v);
-    dJointSetHinge2Axis1(m_JointID, v[0], v[1], v[2]);
+    dJointSetUniversalAxis1 (m_JointID, v[0], v[1], v[2]);
 }
 
 void UniversalJoint::SetUniversalAxis2(double x, double y, double z)
@@ -109,7 +109,7 @@ void UniversalJoint::SetUniversalAxis2(double x, double y, double z)
     dVector3 v;
     v[0] = x; v[1] = y; v[2] = z;
     dNormalize3(v);
-    dJointSetHinge2Axis1(m_JointID, v[0], v[1], v[2]);
+    dJointSetUniversalAxis2 (m_JointID, v[0], v[1], v[2]);
 }
 
 // parses the position allowing a relative position specified by BODY ID
@@ -214,9 +214,96 @@ void UniversalJoint::SetUniversalAxis2(const char *buf)
     SetUniversalAxis2(result[0], result[1], result[2]);
 }
 
+void UniversalJoint::SetStopCFM1(double cfm)
+{
+    dJointSetUniversalParam (m_JointID, dParamStopCFM1, cfm);
+}
+
+void UniversalJoint::SetStopERP1(double erp)
+{
+    dJointSetUniversalParam (m_JointID, dParamStopERP1, erp);
+}
+
+void UniversalJoint::SetStopSpringDamp1(double springConstant, double dampingConstant, double integrationStep)
+{
+    double ERP = integrationStep * springConstant/(integrationStep * springConstant + dampingConstant);
+    double CFM = 1/(integrationStep * springConstant + dampingConstant);
+    SetStopERP1(ERP);
+    SetStopCFM1(CFM);
+}
+
+void UniversalJoint::SetStopSpringERP1(double springConstant, double ERP, double integrationStep)
+{
+    double CFM = ERP / (integrationStep * springConstant);
+    SetStopERP1(ERP);
+    SetStopCFM1(CFM);
+}
+
+void UniversalJoint::SetStopBounce1(double bounce)
+{
+    dJointSetUniversalParam (m_JointID, dParamBounce1, bounce);
+}
+
 void UniversalJoint::SetStartAngleReference1(double startAngleReference)
 {
     m_StartAngleReference1 = startAngleReference;
+}
+
+void UniversalJoint::SetJointStops1(double loStop, double hiStop)
+{
+    if (loStop >= hiStop)
+    {
+        std::cerr << "Error in UniversalJoint::SetJointStops loStop >= hiStop\n";
+        throw(__LINE__);
+    }
+
+    // correct for m_StartAngleReference
+    loStop -= m_StartAngleReference1;
+    hiStop -= m_StartAngleReference1;
+
+    if (loStop < -M_PI) loStop = -dInfinity;
+    if (hiStop > M_PI) hiStop = dInfinity;
+
+    // note there is safety feature that stops setting incompatible low and high
+    // stops which can cause difficulties. The safe option is to set them twice.
+
+    dJointSetUniversalParam(m_JointID, dParamLoStop1, loStop);
+    dJointSetUniversalParam(m_JointID, dParamHiStop1, hiStop);
+    dJointSetUniversalParam(m_JointID, dParamLoStop1, loStop);
+    dJointSetUniversalParam(m_JointID, dParamHiStop1, hiStop);
+
+    // we don't want bouncy stops
+    dJointSetUniversalParam(m_JointID, dParamBounce1, 0);
+}
+
+void UniversalJoint::SetStopCFM2(double cfm)
+{
+    dJointSetUniversalParam (m_JointID, dParamStopCFM2, cfm);
+}
+
+void UniversalJoint::SetStopERP2(double erp)
+{
+    dJointSetUniversalParam (m_JointID, dParamStopERP2, erp);
+}
+
+void UniversalJoint::SetStopSpringDamp2(double springConstant, double dampingConstant, double integrationStep)
+{
+    double ERP = integrationStep * springConstant/(integrationStep * springConstant + dampingConstant);
+    double CFM = 1/(integrationStep * springConstant + dampingConstant);
+    SetStopERP2(ERP);
+    SetStopCFM2(CFM);
+}
+
+void UniversalJoint::SetStopSpringERP2(double springConstant, double ERP, double integrationStep)
+{
+    double CFM = ERP / (integrationStep * springConstant);
+    SetStopERP2(ERP);
+    SetStopCFM2(CFM);
+}
+
+void UniversalJoint::SetStopBounce2(double bounce)
+{
+    dJointSetUniversalParam (m_JointID, dParamBounce2, bounce);
 }
 
 void UniversalJoint::SetStartAngleReference2(double startAngleReference)
@@ -224,46 +311,71 @@ void UniversalJoint::SetStartAngleReference2(double startAngleReference)
     m_StartAngleReference2 = startAngleReference;
 }
 
+void UniversalJoint::SetJointStops2(double loStop, double hiStop)
+{
+    if (loStop >= hiStop)
+    {
+        std::cerr << "Error in UniversalJoint::SetJointStops loStop >= hiStop\n";
+        throw(__LINE__);
+    }
+
+    // correct for m_StartAngleReference
+    loStop -= m_StartAngleReference2;
+    hiStop -= m_StartAngleReference2;
+
+    if (loStop < -M_PI) loStop = -dInfinity;
+    if (hiStop > M_PI) hiStop = dInfinity;
+
+    // note there is safety feature that stops setting incompatible low and high
+    // stops which can cause difficulties. The safe option is to set them twice.
+
+    dJointSetUniversalParam(m_JointID, dParamLoStop2, loStop);
+    dJointSetUniversalParam(m_JointID, dParamHiStop2, hiStop);
+    dJointSetUniversalParam(m_JointID, dParamLoStop2, loStop);
+    dJointSetUniversalParam(m_JointID, dParamHiStop2, hiStop);
+
+    // we don't want bouncy stops
+    dJointSetUniversalParam(m_JointID, dParamBounce2, 0);
+}
+
 void UniversalJoint::GetUniversalAnchor(dVector3 result)
 {
-    dJointGetHinge2Anchor(m_JointID, result);
+    dJointGetUniversalAnchor (m_JointID, result);
 }
 
 void UniversalJoint::GetUniversalAnchor2(dVector3 result)
 {
-    dJointGetHinge2Anchor2(m_JointID, result);
+    dJointGetUniversalAnchor2 (m_JointID, result);
 }
 
 void UniversalJoint::GetUniversalAxis1(dVector3 result)
 {
-    dJointGetHinge2Axis1(m_JointID, result);
+    dJointGetUniversalAxis1 (m_JointID, result);
 }
 
 void UniversalJoint::GetUniversalAxis2(dVector3 result)
 {
-    dJointGetHinge2Axis2(m_JointID, result);
+    dJointGetUniversalAxis2 (m_JointID, result);
 }
 
 double UniversalJoint::GetUniversalAngle1()
 {
-    return dJointGetHinge2Angle1(m_JointID) + m_StartAngleReference1;
+    return dJointGetUniversalAngle1 (m_JointID) + m_StartAngleReference1;
 }
 
 double UniversalJoint::GetUniversalAngle2()
 {
-    // this isn't implemented in ODE yet
-    // return dJointGetHinge2Angle2(m_JointID) + m_StartAngleReference2;
-    return 0;
+    return dJointGetUniversalAngle2 (m_JointID) + m_StartAngleReference1;
 }
 
 double UniversalJoint::GetUniversalAngle1Rate()
 {
-    return dJointGetHinge2Angle1Rate(m_JointID);
+    return dJointGetUniversalAngle1Rate (m_JointID);
 }
 
 double UniversalJoint::GetUniversalAngle2Rate()
 {
-    return dJointGetHinge2Angle2Rate(m_JointID);
+    return dJointGetUniversalAngle2Rate (m_JointID);
 }
 
 void UniversalJoint::Dump()

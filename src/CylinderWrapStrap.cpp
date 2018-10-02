@@ -811,15 +811,18 @@ void CylinderWrapStrap::Draw(SimulationWindow *window)
         m_DrawList.clear();
 
         std::vector<pgd::Vector> polyline;
-        for (i = 0; i < (unsigned int)m_NumPathCoordinates; i++)
+        if (m_NumPathCoordinates)
         {
-            polyline.push_back(m_PathCoordinates[i]);
+            for (i = 0; i < (unsigned int)m_NumPathCoordinates; i++)
+            {
+                polyline.push_back(m_PathCoordinates[i]);
+            }
+            facetedPolyline = new FacetedPolyline(&polyline, m_Radius, kSides);
+            facetedPolyline->SetColour(m_Colour);
+            facetedPolyline->setSimulationWindow(window);
+            facetedPolyline->SetVisible(m_Visible);
+            m_DrawList.push_back(facetedPolyline);
         }
-        facetedPolyline = new FacetedPolyline(&polyline, m_Radius, kSides);
-        facetedPolyline->SetColour(m_Colour);
-        facetedPolyline->setSimulationWindow(window);
-        facetedPolyline->SetVisible(m_Visible);
-        m_DrawList.push_back(facetedPolyline);
 
         // calculate the quaternion that rotates from cylinder coordinates to world coordinates
         const double *q = dBodyGetQuaternion(m_CylinderBody->GetBodyID());

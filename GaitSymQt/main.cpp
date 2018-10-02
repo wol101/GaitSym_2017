@@ -1,7 +1,4 @@
 #include <QApplication>
-#include <QCoreApplication>
-#include <QSettings>
-#include <QSurfaceFormat>
 #include "MainWindow.h"
 
 int main(int argc, char *argv[])

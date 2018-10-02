@@ -26,7 +26,19 @@ public:
     void SetUniversalAxis2(const char *buf);
 
     void SetStartAngleReference1(double startAngleReference);
+    void SetJointStops1(double loStop, double hiStop);
+    void SetStopCFM1(double cfm);
+    void SetStopERP1(double erp);
+    void SetStopBounce1(double bounce);
+    void SetStopSpringDamp1(double springConstant, double dampingConstant, double integrationStep);
+    void SetStopSpringERP1(double springConstant, double ERP, double integrationStep);
     void SetStartAngleReference2(double startAngleReference);
+    void SetJointStops2(double loStop, double hiStop);
+    void SetStopCFM2(double cfm);
+    void SetStopERP2(double erp);
+    void SetStopBounce2(double bounce);
+    void SetStopSpringDamp2(double springConstant, double dampingConstant, double integrationStep);
+    void SetStopSpringERP2(double springConstant, double ERP, double integrationStep);
 
     void GetUniversalAnchor(dVector3 result);
     void GetUniversalAnchor2(dVector3 result);

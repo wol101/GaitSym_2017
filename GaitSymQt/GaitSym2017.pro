@@ -96,7 +96,7 @@ else:win32 {
     HEADERS +=
     SOURCES += \
     ../irrlicht-1.9/source/COSOperator.cpp ../irrlicht-1.9/source/Irrlicht.cpp
-    QMAKE_CXXFLAGS += -bigobj -Wall
+    QMAKE_CXXFLAGS += -bigobj -W4
 #    QMAKE_CXXFLAGS += -openmp
     QMAKE_CXXFLAGS_DEBUG += -Od -RTCsu
     QMAKE_CXXFLAGS_RELEASE += -Ox -fp:fast -GL
@@ -651,7 +651,8 @@ SOURCES += \
     ../GaitSymGaul/do_simplex_search.cpp \
     ../GaitSymGaul/do_simulated_annealling.cpp \
     ../GaitSymGaul/do_tabu_search.cpp \
-    ../GaitSymGaul/utilities.cpp
+    ../GaitSymGaul/utilities.cpp \
+    Settings.cpp
 HEADERS += \
     ../ann_1.1.2/include/ANN/ANN.h \
     ../ann_1.1.2/include/ANN/ANNperf.h \
@@ -1367,7 +1368,8 @@ HEADERS += \
     ../GaitSymGaul/do_simulated_annealling.h \
     ../GaitSymGaul/do_tabu_search.h \
     ../GaitSymGaul/utilities.h \
-    ../GaitSymGaul/gaul/util/gaul/gaul_config_win.h
+    ../GaitSymGaul/gaul/util/gaul/gaul_config_win.h \
+    Settings.h
 FORMS += \
     AboutDialog.ui \
     DialogOutputSelect.ui \

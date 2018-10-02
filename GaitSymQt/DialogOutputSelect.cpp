@@ -24,6 +24,12 @@ DialogOutputSelect::DialogOutputSelect(QWidget *parent) :
     m_ui(new Ui::DialogOutputSelect)
 {
     m_ui->setupUi(this);
+#ifdef Q_OS_MACOS
+    // on MacOS High Sierra (and possibly others), the Qt::Dialog flag disables resizing
+    // if I clear the Qt::Dialog flag and make sure the Qt::Window flag is set (it should be already)
+    // then it seems to let me have resizing without any other side effects
+    setWindowFlags(windowFlags() & (~Qt::Dialog) | Qt::Window);
+#endif
 
     listWidgetBody = 0;
     listWidgetDataTarget = 0;

@@ -67,9 +67,9 @@
 <SETTING order="4" type="double" path="0" display="1" label="EnvironmentAxesSize" key="EnvironmentAxesSize" value="1" defaultValue="1"/>
 <SETTING order="4" type="double" path="0" display="1" label="GeomAxesSize" key="GeomAxesSize" value="0.1" defaultValue="0.1"/>
 <SETTING order="4" type="QColor" path="0" display="1" label="GeomColour" key="GeomColour" value="#ffffff00" defaultValue="#ffffff00"/>
-<SETTING order="4" type="QColor" path="0" display="1" label="ContactForceColour" key="GeomForceColour" value="#ffffff00" defaultValue="#ffffff00"/>
-<SETTING order="4" type="double" path="0" display="1" label="ContactForceRadius" key="GeomForceRadius" value="0.01" defaultValue="0.01"/>
-<SETTING order="4" type="double" path="0" display="1" label="ContactForceScale" key="GeomForceScale" value="1e-5" defaultValue="1e-5"/>
+<SETTING order="4" type="QColor" path="0" display="1" label="ContactForceColour" key="ContactForceColour" value="#ffffff00" defaultValue="#ffffff00"/>
+<SETTING order="4" type="double" path="0" display="1" label="ContactForceRadius" key="ContactForceRadius" value="0.01" defaultValue="0.01"/>
+<SETTING order="4" type="double" path="0" display="1" label="ContactForceScale" key="ContactForceScale" value="1e-5" defaultValue="1e-5"/>
 <SETTING order="4" type="double" path="0" display="1" label="JointAxesSize" key="JointAxesSize" value="0.05" defaultValue="0.05"/>
 <SETTING order="4" type="QColor" path="0" display="1" label="JointColour" key="JointColour" value="#ff0000ff" defaultValue="#ff0000ff"/>
 <SETTING order="4" type="QColor" path="0" display="1" label="MarkerColour" key="MarkerColour" value="#ffff8000" defaultValue="#ffff8000"/>

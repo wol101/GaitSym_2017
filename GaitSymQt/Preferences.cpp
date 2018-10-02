@@ -7,7 +7,6 @@
  *
  */
 
-#include <QSettings>
 #include <QFile>
 #include <QTextStream>
 #include <QString>
@@ -16,6 +15,7 @@
 #include <QDomDocument>
 
 #include "Preferences.h"
+#include "Settings.h"
 
 Preferences::Preferences()
 {
@@ -27,32 +27,27 @@ Preferences::~Preferences()
 
 void Preferences::Write()
 {
-    qDebug() << "Preferences::Write() Organisation " << valueQString("Organisation") << " Application " << valueQString("Application");
-    QSettings settings(valueQString("Organisation"), valueQString("Application"));
-    settings.clear();
+    Settings::clear();
     for (QMap<QString, SettingsItem>::const_iterator i = m_settings.constBegin(); i != m_settings.constEnd(); i++)
     {
         qDebug("%s: %s", qUtf8Printable(i.key()), qUtf8Printable(i.value().value.toString()));
-        settings.setValue(i.key(), i.value().value);
+        Settings::setValue(i.key(), i.value().value);
     }
-    settings.sync();
+    Settings::sync();
 }
 
 void Preferences::Read()
 {
     LoadDefaults();
-    qDebug() << "Preferences::Read() Organisation " << valueQString("Organisation") << " Application " << valueQString("Application");
-    QSettings settings(valueQString("Organisation"), valueQString("Application"));
     // check whether the settings are the right ones
-    if (settings.value("SettingsCode") != m_settings["SettingsCode"].value)
+    if (Settings::value("SettingsCode", QString()) != m_settings["SettingsCode"].value)
     {
-        settings.clear();
-        settings.sync();
+        Write();
     }
     else
     {
-        QStringList keys = settings.allKeys();
-        for (int i = 0; i < keys.size(); i++) insert(keys[i], settings.value(keys[i]));
+        QStringList keys = Settings::allKeys();
+        for (int i = 0; i < keys.size(); i++) insert(keys[i], Settings::value(keys[i], QVariant()));
     }
 }
 
@@ -74,7 +69,7 @@ void Preferences::Export(const QString &filename)
 
     for (QMultiMap<int, SettingsItem>::const_iterator i = sortedItems.constBegin(); i != sortedItems.constEnd(); i++)
     {
-        qDebug("%s: %s", qUtf8Printable(i.key()), qUtf8Printable(i.value().value.toString()));
+//        qDebug("%d: %s", i.key(), qUtf8Printable(i.value().value.toString()));
         QDomElement setting = doc.createElement("SETTING");
         root.appendChild(setting);
         setting.setAttribute("key", i.value().key);
@@ -136,7 +131,7 @@ void Preferences::Import(const QString &filename)
     }
     file.close();
 
-    QDomElement docElem = doc.documentElement();   
+    QDomElement docElem = doc.documentElement();
     ParseQDomElement(docElem);
 }
 
@@ -155,7 +150,7 @@ void Preferences::ParseQDomElement(const QDomElement &docElem)
     while(!n.isNull())
     {
         QDomElement e = n.toElement(); // try to convert the node to an element.
-        qDebug() << e.tagName() << "\n";
+//        qDebug() << e.tagName() << "\n";
         if (!e.isNull())
         {
             if (e.tagName() == "SETTING")

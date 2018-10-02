@@ -33,6 +33,8 @@ Contact::Contact()
 #ifdef USE_QT
     m_drawContactForces = false;
     m_LastDrawTime = -1;
+    m_ForceRadius = 0;
+    m_ForceScale = 0;
 #endif
 }
 

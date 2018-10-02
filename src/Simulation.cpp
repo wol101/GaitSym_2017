@@ -2037,6 +2037,97 @@ void Simulation::ParseJoint(rapidxml::xml_node<char> * cur)
         THROWIFZERO(buf = DoXmlGetProp(cur, "UniversalAxis2"));
         universalJoint->SetUniversalAxis2((const char *)buf);
 
+        buf = DoXmlGetProp(cur, "StartAngleReference1");
+        if (buf)
+        {
+            universalJoint->SetStartAngleReference1(Util::GetAngle(buf));
+            THROWIFZERO(buf = DoXmlGetProp(cur, "ParamLoStop1"));
+            double loStop = Util::GetAngle(buf);
+            THROWIFZERO(buf = DoXmlGetProp(cur, "ParamHiStop1"));
+            double hiStop = Util::GetAngle(buf);
+            universalJoint->SetJointStops1(loStop, hiStop);
+        }
+
+        // can specify StopERP & StopCFM; StopSpringConstant & StopDampingConstant; StopSpringConstant & StopERP
+        // but not StopCFM & StopDampingConstant - can't think why you would want to
+        buf = DoXmlGetProp(cur, "StopCFM1");
+        if (buf)
+        {
+            universalJoint->SetStopCFM1(Util::Double(buf));
+        }
+        buf = DoXmlGetProp(cur, "StopERP1");
+        if (buf)
+        {
+            universalJoint->SetStopERP1(Util::Double(buf));
+        }
+        buf = DoXmlGetProp(cur, "StopSpringConstant1");
+        if (buf)
+        {
+            double ks = Util::Double(buf);
+            buf = DoXmlGetProp(cur, "StopDampingConstant1");
+            if (buf)
+            {
+                double kd = Util::Double(buf);
+                universalJoint->SetStopSpringDamp1(ks, kd, m_StepSize);
+            }
+            else
+            {
+                THROWIFZERO(buf = DoXmlGetProp(cur, "StopERP1"));
+                double erp = Util::Double(buf);
+                universalJoint->SetStopSpringERP1(ks, erp, m_StepSize);
+            }
+        }
+        buf = DoXmlGetProp(cur, "StopBounce1");
+        if (buf)
+        {
+            universalJoint->SetStopBounce1(Util::Double(buf));
+        }
+
+        buf = DoXmlGetProp(cur, "StartAngleReference2");
+        if (buf)
+        {
+            universalJoint->SetStartAngleReference2(Util::GetAngle(buf));
+            THROWIFZERO(buf = DoXmlGetProp(cur, "ParamLoStop2"));
+            double loStop = Util::GetAngle(buf);
+            THROWIFZERO(buf = DoXmlGetProp(cur, "ParamHiStop2"));
+            double hiStop = Util::GetAngle(buf);
+            universalJoint->SetJointStops2(loStop, hiStop);
+        }
+
+        // can specify StopERP & StopCFM; StopSpringConstant & StopDampingConstant; StopSpringConstant & StopERP
+        // but not StopCFM & StopDampingConstant - can't think why you would want to
+        buf = DoXmlGetProp(cur, "StopCFM2");
+        if (buf)
+        {
+            universalJoint->SetStopCFM2(Util::Double(buf));
+        }
+        buf = DoXmlGetProp(cur, "StopERP2");
+        if (buf)
+        {
+            universalJoint->SetStopERP2(Util::Double(buf));
+        }
+        buf = DoXmlGetProp(cur, "StopSpringConstant2");
+        if (buf)
+        {
+            double ks = Util::Double(buf);
+            buf = DoXmlGetProp(cur, "StopDampingConstant2");
+            if (buf)
+            {
+                double kd = Util::Double(buf);
+                universalJoint->SetStopSpringDamp2(ks, kd, m_StepSize);
+            }
+            else
+            {
+                THROWIFZERO(buf = DoXmlGetProp(cur, "StopERP2"));
+                double erp = Util::Double(buf);
+                universalJoint->SetStopSpringERP2(ks, erp, m_StepSize);
+            }
+        }
+        buf = DoXmlGetProp(cur, "StopBounce2");
+        if (buf)
+        {
+            universalJoint->SetStopBounce2(Util::Double(buf));
+        }
     }
 
     else if (strcmp((const char *)buf, "AMotor") == 0)
@@ -3728,7 +3819,6 @@ void Simulation::OutputProgramState()
                 strcmp(currentNode->name(), "IOCONTROL") == 0 ||
                 strcmp(currentNode->name(), "GLOBAL") == 0 ||
                 strcmp(currentNode->name(), "ENVIRONMENT") == 0 ||
-                strcmp(currentNode->name(), "INTERFACE") == 0 ||
                 strcmp(currentNode->name(), "DATATARGET") == 0 ||
                 strcmp(currentNode->name(), "CONTROLLER") == 0 ||
                 strcmp(currentNode->name(), "MARKER") == 0)
@@ -4541,6 +4631,7 @@ void Simulation::NearCallback(void *data, dGeomID o1, dGeomID o2)
             if (((Geom *)dGeomGetData(o2))->GetAbort()) s->SetContactAbort(true);
 
             myContact = new Contact();
+            myContact->setSimulation(s);
             dJointSetFeedback(c, myContact->GetJointFeedback());
             myContact->SetJointID(c);
             memcpy(myContact->GetContactPosition(), contact[i].geom.pos, sizeof(dVector3));

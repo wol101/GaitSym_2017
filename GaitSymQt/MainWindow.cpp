@@ -4,7 +4,6 @@
 #include <QBoxLayout>
 #include <QDesktopWidget>
 #include <QListWidgetItem>
-#include <QSettings>
 #include <QLineEdit>
 #include <QFile>
 #include <QKeyEvent>
@@ -17,6 +16,7 @@
 
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
+#include "Settings.h"
 #include "DialogPreferences.h"
 #include "DialogOutputSelect.h"
 #include "ui_DialogOutputSelect.h"
@@ -321,6 +321,7 @@ void MainWindow::open(const QString &fileName)
     }
 
     m_simulationWindow->setSimulation(m_simulation);
+    m_simulation->setDrawContactForces(m_preferences->valueBool("DisplayContactForces"));
     m_simulation->Draw(m_simulationWindow);
     if (m_preferences->valueBool("TrackingFlag"))
     {
@@ -1123,6 +1124,8 @@ void MainWindow::menuRequestBody(QPoint p)
     QMenu menu(this);
     menu.addAction(tr("All On"));
     menu.addAction(tr("All Off"));
+    menu.addSeparator();
+    menu.addAction(tr("Set Track Body"));
 
     QPoint gp = ui->listWidgetBody->mapToGlobal(p);
 
@@ -1133,21 +1136,41 @@ void MainWindow::menuRequestBody(QPoint p)
     bool visible;
     if (action)
     {
-        if (action->text() == tr("All On"))
+        if (action->text() == tr("Set Track Body"))
         {
-            state = Qt::Checked;
-            visible = true;
+            item = ui->listWidgetBody->currentItem();
+            m_preferences->insert("TrackBodyID", item->text());
+            if (m_preferences->valueBool("TrackingFlag"))
+            {
+                Body *body = m_simulation->GetBody(m_preferences->valueQString("TrackBodyID").toUtf8().constData());
+                if (body)
+                {
+                    const double *position = dBodyGetPosition(body->GetBodyID());
+                    m_simulationWindow->setCOIx(position[0] + m_preferences->valueDouble("TrackingOffset"));
+                    ui->doubleSpinBoxCOIX->setValue(position[0] + m_preferences->valueDouble("TrackingOffset"));
+                    m_simulationWindow->updateCamera();
+                    m_simulationWindow->renderLater();
+                }
+            }
         }
         else
         {
-            state = Qt::Unchecked;
-            visible = false;
-        }
-        for (i = 0; i < ui->listWidgetBody->count(); i++)
-        {
-            item = ui->listWidgetBody->item(i);
-            item->setCheckState(state);
-            (*m_simulation->GetBodyList())[std::string(item->text().toUtf8())]->SetVisible(visible);
+            if (action->text() == tr("All On"))
+            {
+                state = Qt::Checked;
+                visible = true;
+            }
+            if (action->text() == tr("All Off"))
+            {
+                state = Qt::Unchecked;
+                visible = false;
+            }
+            for (i = 0; i < ui->listWidgetBody->count(); i++)
+            {
+                item = ui->listWidgetBody->item(i);
+                item->setCheckState(state);
+                (*m_simulation->GetBodyList())[std::string(item->text().toUtf8())]->SetVisible(visible);
+            }
         }
         m_simulation->Draw(m_simulationWindow);
         m_simulationWindow->updateCamera();

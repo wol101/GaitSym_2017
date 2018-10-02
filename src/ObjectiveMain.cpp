@@ -264,7 +264,7 @@ int GaitSymMain(int argc, char *argv[])
             gFinishedFlag = true;
             runCount++;
             if (runCount % 100 == 0) std::cout << "gSimulationTime=" << gSimulationTime << " gIOTime=" << gIOTime << "\n" << std::flush;
-            if (WriteModel()) std::cerr << "Error writing results\n";
+            if (WriteModel()) return 0;
         }
     }
     return 0;
