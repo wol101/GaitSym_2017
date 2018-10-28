@@ -171,7 +171,7 @@ void PlaneGeom::Draw(SimulationWindow *window)
         floorTexture->unlock();
 #endif
 
-        irr::u32 xRange = 100, yRange = 100;
+        irr::u32 xRange = 250, yRange = 250;
         irr::core::dimension2d<irr::f32> tileSize(2.f, 2.f); // for a 2x2 checkerboard
         irr::core::dimension2d<irr::u32> tileCount(xRange, yRange);
         irr::video::SMaterial material;

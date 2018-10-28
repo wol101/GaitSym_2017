@@ -600,12 +600,18 @@ void Simulation::UpdateSimulation()
 #ifdef DEBUG_CHECK_FORCES
         pgd::Vector force(0, 0, 0);
 #endif
-        for (unsigned int i = 0; i < pointForceList->size(); i++)
+        // this check is for the special case of a 2 point strap with both points attached to the same muscle
+        // we use this hack to generate uncoupled point forces e.g. when simulating a jet
+        // this is a hack for NASA SpaceApps 2018
+        size_t numPointForces = pointForceList->size();
+        if (pointForceList->size() == 2 && pointForceList->at(0)->body->GetBodyID() == pointForceList->at(1)->body->GetBodyID())
+            numPointForces = 1;
+        for (size_t i = 0; i < numPointForces; i++)
         {
             pointForce = (*pointForceList)[i];
             dBodyAddForceAtPos(pointForce->body->GetBodyID(),
                                pointForce->vector[0] * tension, pointForce->vector[1] * tension, pointForce->vector[2] * tension,
-                               pointForce->point[0], pointForce->point[1], pointForce->point[2]);
+                    pointForce->point[0], pointForce->point[1], pointForce->point[2]);
 #ifdef DEBUG_CHECK_FORCES
             force += pgd::Vector(pointForce->vector[0] * tension, pointForce->vector[1] * tension, pointForce->vector[2] * tension);
 #endif
@@ -3225,7 +3231,7 @@ void Simulation::ParseDataTarget(rapidxml::xml_node<char> * cur)
         THROWIFZERO(buf = DoXmlGetProp(cur, "TargetValues"));
         count = DataFile::CountTokens((char *)buf);
         Util::Double(buf, count, m_DoubleList);
-        dataTargetVector->SetTargetValues(count, m_DoubleList);
+        dataTargetVector->SetTargetValues(count / 3, m_DoubleList); // HACK - FIX ME
 
         // check presence of AbortThreshold
         buf = DoXmlGetProp(cur, "AbortThreshold");

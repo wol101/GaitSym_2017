@@ -482,6 +482,7 @@ gaitsym_distribution_extras:
 	cp -rf libgwavi distribution/
 	cp -rf ode-0.15 distribution/
 	cp -rf rapidxml-1.13 distribution/
+	cp -rf GaitSymGaul distribution/
 	cp makefile distribution/
 	find distribution -depth -type d -name CVS -print -exec rm -rf {} \;
 	rm -rf distribution/GaitSymQt/GaitSymQt.pro.*

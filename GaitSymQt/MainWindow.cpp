@@ -225,11 +225,7 @@ void MainWindow::newFromGeometry()
 
 void MainWindow::open()
 {
-    QFileInfo info = m_preferences->valueQString("LastFileOpened");
-    while (info.exists() == false)
-    {
-        info = QFileInfo(info.dir().absolutePath());
-    }
+    QString lastFileOpened = m_preferences->valueQString("LastFileOpened");
 
     QString fileName;
     QStringList geometryFileNames;
@@ -237,11 +233,11 @@ void MainWindow::open()
 
     if (m_newFromGeometryFlag)
     {
-        geometryFileNames = QFileDialog::getOpenFileNames(this, tr("Select the geometry files required"), info.absoluteFilePath(), tr("Geometry Files (*.obj)"), 0);
+        geometryFileNames = QFileDialog::getOpenFileNames(this, tr("Select the geometry files required"), lastFileOpened, tr("Geometry Files (*.obj)"), 0);
     }
     else
     {
-        fileName = QFileDialog::getOpenFileName(this, tr("Open Config File"), info.absoluteFilePath(), tr("Config Files (*.xml)"), 0);
+        fileName = QFileDialog::getOpenFileName(this, tr("Open Config File"), lastFileOpened, tr("Config Files (*.xml)"), 0);
     }
 
     if (fileName.isNull() == false || geometryFileNames.size() > 0)
