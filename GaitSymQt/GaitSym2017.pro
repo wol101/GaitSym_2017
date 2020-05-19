@@ -40,8 +40,8 @@ macx {
     OBJECTIVE_SOURCES += \
     ../irrlicht-1.9/source/CIrrDeviceOSX.mm ../irrlicht-1.9/source/CNSOGLManager.mm ../irrlicht-1.9/source/COSOperator.mm ../irrlicht-1.9/source/Irrlicht.mm
     QMAKE_CXXFLAGS += -std=c++11
-    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.10
-    QMAKE_MAC_SDK = macosx10.11
+#    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.10
+#    QMAKE_MAC_SDK = macosx10.11
     QMAKE_CXXFLAGS_RELEASE += -O3 -ffast-math
 #    QMAKE_CXXFLAGS_RELEASE += -O0 \ #turned off optimisation because of the sincos undefined symbol error
 #        -ffast-math

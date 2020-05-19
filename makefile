@@ -485,6 +485,6 @@ gaitsym_distribution_extras:
 	cp -rf GaitSymGaul distribution/
 	cp makefile distribution/
 	find distribution -depth -type d -name CVS -print -exec rm -rf {} \;
-	rm -rf distribution/GaitSymQt/GaitSymQt.pro.*
+	rm -rf distribution/GaitSymQt/GaitSym*.pro.*
 
 
