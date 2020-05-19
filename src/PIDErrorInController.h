@@ -23,6 +23,8 @@ public:
 
 //    void setOutputIsDelta(bool outputIsDelta);
 
+    virtual void Dump();
+
 protected:
 
     double m_Kp;

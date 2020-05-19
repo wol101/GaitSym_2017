@@ -42,6 +42,22 @@ void Driver::SetTarget(Drivable *target)
     m_Target->AddDriver(this);
 }
 
+Drivable *Driver::GetTarget()
+{
+    return m_Target;
+}
+
+void Driver::SetMinMax(double minV, double maxV)
+{
+    m_MinValue = minV;
+    m_MaxValue = maxV;
+}
+
+void Driver::SetInterp(bool interp)
+{
+    m_Interp = interp;
+}
+
 void Driver::Dump()
 {
     if (m_Dump == false) return;

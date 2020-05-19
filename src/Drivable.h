@@ -16,14 +16,12 @@
 
 class Driver;
 
-class Drivable : public NamedObject
+class Drivable
 {
 public:
     Drivable();
 
     void AddDriver(Driver *driver) { m_driverList.push_back(driver); }
-    double GetCurrentDriverSum() { return m_currentDriverSum; }
-    void SetCurrentDriverSum(double currentDriverSum) { m_currentDriverSum = currentDriverSum; }
     double SumDrivers(double time);
 
 protected:

@@ -17,6 +17,8 @@ class Controller : public Driver, public Drivable
 {
 public:
     Controller();
+
+    virtual void Dump() = 0;
 };
 
 #endif // CONTROLLER_H

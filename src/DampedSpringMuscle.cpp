@@ -25,6 +25,7 @@ DampedSpringMuscle::DampedSpringMuscle(Strap *strap): Muscle(strap)
     m_UnloadedLength = 0;
     m_Activation = 0;
     m_Area = 1;
+    m_BreakingStrain = 0;
 }
 
 // destructor
@@ -81,6 +82,18 @@ void DampedSpringMuscle::SetActivation(double activation, double /* duration */)
         *gDebugStream << "DampedSpringMuscle::UpdateTension m_Name " << m_Name << " m_Strap->GetLength() " << m_Strap->GetLength() << " m_UnloadedLength " << m_UnloadedLength
             << " m_SpringConstant " << m_SpringConstant << " m_Strap->GetVelocity() " << m_Strap->GetVelocity()
             << " m_Damping " << m_Damping << " tension " << tension << "\n";
+}
+
+bool DampedSpringMuscle::ShouldBreak()
+{
+    if (m_BreakingStrain <= 0) return false;
+    double elasticStrain = (m_Strap->GetLength() - m_UnloadedLength) / m_UnloadedLength;
+    if (elasticStrain > m_BreakingStrain)
+    {
+        std::cerr << "DampedSpringMuscle::ShouldBreak returns true\n";
+        return true;
+    }
+    return false;
 }
 
 void DampedSpringMuscle::Dump()

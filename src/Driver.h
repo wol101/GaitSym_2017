@@ -15,16 +15,16 @@
 
 class Drivable;
 
-class Driver: public NamedObject
+class Driver : public NamedObject
 {
 public:
     Driver();
     virtual ~Driver() ;
 
     void SetTarget(Drivable *target);
-    Drivable *GetTarget() { return m_Target; }
-    void SetMinMax(double minV, double maxV) { m_MinValue = minV; m_MaxValue = maxV; }
-    void SetInterp(bool interp) { m_Interp = interp; }
+    Drivable *GetTarget();
+    void SetMinMax(double minV, double maxV);
+    void SetInterp(bool interp);
 
     virtual double GetValue(double time) = 0;
 

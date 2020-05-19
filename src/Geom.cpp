@@ -37,6 +37,7 @@ Geom::Geom()
     m_Bounce = -1; // < 0 is not used
     m_Mu = dInfinity;
     m_Abort = false;
+    m_Adhesion = false;
 }
 
 Geom::~Geom()

@@ -33,6 +33,7 @@
 #include "DataTarget.h"
 #include "FacetedObject.h"
 #include "Reporter.h"
+#include "Controller.h"
 #include "Warehouse.h"
 #include "Preferences.h"
 #include "SimulationWindow.h"
@@ -319,7 +320,7 @@ void MainWindow::open(const QString &fileName)
     m_simulationWindow->setSimulation(m_simulation);
     m_simulation->setDrawContactForces(m_preferences->valueBool("DisplayContactForces"));
     m_simulation->Draw(m_simulationWindow);
-    if (m_preferences->valueBool("TrackingFlag"))
+    if (ui->checkBoxTracking->isChecked())
     {
         Body *body = m_simulation->GetBody(m_preferences->valueQString("TrackBodyID").toUtf8().constData());
         if (body)
@@ -329,6 +330,19 @@ void MainWindow::open(const QString &fileName)
             ui->doubleSpinBoxCOIX->setValue(position[0] + m_preferences->valueDouble("TrackingOffset"));
         }
     }
+    if (ui->checkBoxActivationColours->isChecked())
+    {
+        std::map<std::string, Muscle *> *muscleList = m_simulation->GetMuscleList();
+        std::map<std::string, Muscle *>::const_iterator muscleIter;
+        for (muscleIter = muscleList->begin(); muscleIter != muscleList->end(); muscleIter++)
+        {
+            muscleIter->second->setActivationDisplay(true);
+            muscleIter->second->GetStrap()->SetColour(m_preferences->valueQColor("StrapColour"));
+            muscleIter->second->GetStrap()->SetForceColour(Colour(m_preferences->valueQColor("StrapForceColour")));
+            muscleIter->second->GetStrap()->SetLastDrawTime(-1);
+        }
+    }
+
 
     m_simulationWindow->updateCamera();
     m_simulationWindow->renderLater();
@@ -1011,6 +1025,13 @@ void MainWindow::menuOutputs()
             item = dialogOutputSelect.listWidgetReporter->item(i);
             if (item->checkState() == Qt::Unchecked) dump = false; else dump = true;
             (*m_simulation->GetReporterList())[std::string(item->text().toUtf8())]->SetDump(dump);
+        }
+
+        for (i = 0; dialogOutputSelect.listWidgetController && i < dialogOutputSelect.listWidgetController->count(); i++)
+        {
+            item = dialogOutputSelect.listWidgetController->item(i);
+            if (item->checkState() == Qt::Unchecked) dump = false; else dump = true;
+            (*m_simulation->GetControllerList())[std::string(item->text().toUtf8())]->SetDump(dump);
         }
 
         for (i = 0; dialogOutputSelect.listWidgetWarehouse && i < dialogOutputSelect.listWidgetWarehouse->count(); i++)

@@ -13,6 +13,9 @@
 #ifdef USE_QT
 #include "GLUtils.h"
 #include "SimulationWindow.h"
+#include "Simulation.h"
+#include "MainWindow.h"
+#include "Preferences.h"
 
 // ruler definition
 //static float gRulerMin = -500;
@@ -55,6 +58,8 @@ void Environment::Draw(SimulationWindow *window)
 
     if (m_axisSceneNode == 0)
     {
+        this->SetAxisSize(m_simulation->GetMainWindow()->GetPreferences()->valueDouble("EnvironmentAxesSize"));
+
         // create meshes for the axes
         irr::scene::IMesh *mesh;
         irr::scene::IMeshSceneNode *sceneNode;
@@ -66,6 +71,7 @@ void Environment::Draw(SimulationWindow *window)
         m_axisSceneNode = window->sceneManager()->addMeshSceneNode(mesh);
         mesh->drop();
         m_axisSceneNode->setAutomaticCulling(irr::scene::EAC_OFF);
+        m_axisSceneNode->setScale(irr::core::vector3df(m_AxisSize[0], m_AxisSize[0], m_AxisSize[0]));
 
         irr::u32 tesselationCylinder = 64;
         irr::u32 tesselationCone = 128;
@@ -81,6 +87,7 @@ void Environment::Draw(SimulationWindow *window)
         mesh->drop();
         sceneNode->setAutomaticCulling(irr::scene::EAC_OFF);
         sceneNode->setRotation(irr::core::vector3df(0, 0, -90)); // rotates Y direction to X direction
+        sceneNode->setScale(irr::core::vector3df(m_AxisSize[0], m_AxisSize[0], m_AxisSize[0]));
 
         colorCylinder.set(255, 0, 255, 0); // green
         colorCone = colorCylinder;
@@ -90,6 +97,7 @@ void Environment::Draw(SimulationWindow *window)
         mesh->drop();
         sceneNode->setAutomaticCulling(irr::scene::EAC_OFF);
         sceneNode->setRotation(irr::core::vector3df(0, 0, 0)); // rotates Y direction to Y direction
+        sceneNode->setScale(irr::core::vector3df(m_AxisSize[0], m_AxisSize[0], m_AxisSize[0]));
 
         colorCylinder.set(255, 0, 0, 255); // blue
         colorCone = colorCylinder;
@@ -99,6 +107,7 @@ void Environment::Draw(SimulationWindow *window)
         mesh->drop();
         sceneNode->setAutomaticCulling(irr::scene::EAC_OFF);
         sceneNode->setRotation(irr::core::vector3df(90, 0, 0)); // rotates Y direction to Z direction
+        sceneNode->setScale(irr::core::vector3df(m_AxisSize[0], m_AxisSize[0], m_AxisSize[0]));
 
     }
 

@@ -15,6 +15,7 @@
 #include "Driver.h"
 #include "DataTarget.h"
 #include "Reporter.h"
+#include "Controller.h"
 #include "Warehouse.h"
 #include "MainWindow.h"
 #include "Preferences.h"
@@ -38,6 +39,7 @@ DialogOutputSelect::DialogOutputSelect(QWidget *parent) :
     listWidgetJoint = 0;
     listWidgetMuscle = 0;
     listWidgetReporter = 0;
+    listWidgetController = 0;
     listWidgetWarehouse = 0;
 
     gridLayout = new QGridLayout(this);
@@ -56,6 +58,7 @@ DialogOutputSelect::DialogOutputSelect(QWidget *parent) :
     std::map<std::string, Driver *> *driverList = simulation->GetDriverList();
     std::map<std::string, DataTarget *> *dataTargetList = simulation->GetDataTargetList();
     std::map<std::string, Reporter *> *reporterList = simulation->GetReporterList();
+    std::map<std::string, Controller *> *controllerList = simulation->GetControllerList();
     std::map<std::string, Warehouse *> *warehouseList = simulation->GetWarehouseList();
 
     m_columns = 0;
@@ -211,6 +214,28 @@ DialogOutputSelect::DialogOutputSelect(QWidget *parent) :
         gridLayout->addWidget(label, 0, m_columns);
         m_columns++;
         QObject::connect(listWidgetReporter, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(menuRequestReporter(QPoint)));
+    }
+
+    if (controllerList->size() > 0)
+    {
+        listWidgetController = new QListWidget(this);
+        listWidgetController->setFont(listWidgetFont);
+        listWidgetController->setContextMenuPolicy(Qt::CustomContextMenu);
+        count = 0;
+        listWidgetController->clear();
+        std::map<std::string, Controller *>::const_iterator controllerIterator;
+        for (controllerIterator = controllerList->begin(); controllerIterator != controllerList->end(); controllerIterator++)
+        {
+            listWidgetController->addItem(controllerIterator->first.c_str());
+            item = listWidgetController->item(count++);
+            if (controllerIterator->second->GetDump()) item->setCheckState(Qt::Checked);
+            else item->setCheckState(Qt::Unchecked);
+        }
+        gridLayout->addWidget(listWidgetController, 1, m_columns);
+        label = new QLabel("Controller List", this);
+        gridLayout->addWidget(label, 0, m_columns);
+        m_columns++;
+        QObject::connect(listWidgetController, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(menuRequestController(QPoint)));
     }
 
     if (warehouseList->size() > 0)
@@ -502,6 +527,39 @@ void DialogOutputSelect::menuRequestReporter(QPoint p)
         for (i = 0; i < listWidgetReporter->count(); i++)
         {
             item = listWidgetReporter->item(i);
+            item->setCheckState(state);
+        }
+    }
+}
+
+void DialogOutputSelect::menuRequestController(QPoint p)
+{
+    QMenu menu(this);
+    menu.addAction(tr("All On"));
+    menu.addAction(tr("All Off"));
+
+    QPoint gp = listWidgetController->mapToGlobal(p);
+
+    QAction *action = menu.exec(gp);
+    QListWidgetItem *item;
+    Qt::CheckState state;
+    int i;
+    bool dump;
+    if (action)
+    {
+        if (action->text() == tr("All On"))
+        {
+            state = Qt::Checked;
+            dump = true;
+        }
+        else
+        {
+            state = Qt::Unchecked;
+            dump = false;
+        }
+        for (i = 0; i < listWidgetController->count(); i++)
+        {
+            item = listWidgetController->item(i);
             item->setCheckState(state);
         }
     }

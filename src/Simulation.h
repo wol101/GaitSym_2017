@@ -94,6 +94,7 @@ public:
     Marker *GetMarker(const char *name);
     Environment *GetEnvironment() { return m_Environment; }
     bool GetOutputModelStateOccured() { return m_OutputModelStateOccured; }
+    int GetDisplaySkip() { return m_DisplaySkip; }
 
     void SetTimeLimit(double timeLimit) { m_TimeLimit = timeLimit; }
     void SetMetabolicEnergyLimit(double energyLimit) { m_MetabolicEnergyLimit = energyLimit; }
@@ -110,6 +111,7 @@ public:
     void SetMungeRotationFlag(bool f) { m_MungeRotationFlag = f; }
     void SetModelStateRelative(bool f) { m_ModelStateRelative = f; }
     void SetWarehouseFailDistanceAbort(double warehouseFailDistanceAbort) { m_WarehouseFailDistanceAbort = warehouseFailDistanceAbort; if (m_FitnessType == ClosestWarehouse) m_FitnessType = DistanceTravelled; }
+    void SetDisplaySkip(int displaySkip) { m_DisplaySkip = displaySkip; }
 
     void AddWarehouse(const char *filename);
 

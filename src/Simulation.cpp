@@ -107,10 +107,12 @@ Simulation::Simulation()
     // initialise the ODE world
     dInitODE();
     m_WorldID = dWorldCreate();
-    m_SpaceID = dSimpleSpaceCreate(0);
+    // m_SpaceID = dSimpleSpaceCreate(0);
+    m_SpaceID = dHashSpaceCreate(nullptr);
     m_ContactGroup = dJointGroupCreate(0);
 
     m_Environment = new Environment();
+    m_Environment->setSimulation(this);
     m_MaxContacts = 16;
     m_DefaultContact = new Contact();
 
@@ -570,7 +572,6 @@ void Simulation::UpdateSimulation()
     for (GeomIter = m_GeomList.begin(); GeomIter != m_GeomList.end(); GeomIter++) GeomIter->second->ClearContacts();
     dSpaceCollide(m_SpaceID, this, &NearCallback);
 
-    bool activationsDone = false;
 
 //    if (activationsDone == false)
 //    {
@@ -589,11 +590,21 @@ void Simulation::UpdateSimulation()
     std::vector<PointForce *> *pointForceList;
     std::map<std::string, Muscle *>::const_iterator iter1;
     PointForce *pointForce;
-    for (iter1 = m_MuscleList.begin(); iter1 != m_MuscleList.end(); iter1++)
+    for (iter1 = m_MuscleList.begin(); iter1 != m_MuscleList.end(); )
     {
-        if (activationsDone == false) iter1->second->SumDrivers(m_SimulationTime);
-        iter1->second->SetActivation(iter1->second->GetCurrentDriverSum(), m_StepSize);
+        iter1->second->SetActivation(iter1->second->SumDrivers(m_SimulationTime), m_StepSize);
         iter1->second->CalculateStrap(m_StepSize);
+        // check for breaking strain
+        DampedSpringMuscle *dampedSpringMuscle = dynamic_cast<DampedSpringMuscle *>(iter1->second);
+        if (dampedSpringMuscle)
+        {
+            if (dampedSpringMuscle->ShouldBreak())
+            {
+                iter1 = m_MuscleList.erase(iter1); // erase returns the next iterator [but m_MuscleList.erase(iter1++) would also work and is compatible with pre C++11 compilers]
+                delete dampedSpringMuscle;
+                continue;
+            }
+        }
 
         pointForceList = iter1->second->GetPointForceList();
         tension = iter1->second->GetTension();
@@ -621,6 +632,7 @@ void Simulation::UpdateSimulation()
         std::cerr << iter1->first << " " << force.x << " " << force.y << " " << force.z << "\n";
         std::cerr.unsetf(std::ios::floatfield);
 #endif
+        iter1++; // this is done here because the erase that might happen earlier needs to increment the iterator
     }
 
     // update the joints (needed for motors, end stops and stress calculations)
@@ -728,7 +740,7 @@ void Simulation::UpdateSimulation()
 
     // all reporting is done after a simulation step
 
-    Dump();
+    if (m_StepCount % m_DisplaySkip == 0) Dump();
 
     if (gDebug == MuscleDebug)
     {
@@ -2371,6 +2383,18 @@ void Simulation::ParseGeom(rapidxml::xml_node<char> * cur)
         geom->SetAbort(Util::Bool(buf));
     }
 
+    buf = DoXmlGetProp(cur, "Adhesion");
+    if (buf)
+    {
+        bool adhesion = Util::Bool(buf);
+        if (adhesion && m_AllowConnectedCollisions)
+        {
+            std::cerr << "Adhesion and AllowConnectedCollisions currently not implemented\n";
+            throw(__LINE__);
+        }
+        geom->SetAdhesion(adhesion);
+    }
+
 #ifdef USE_QT
     if (m_loadMeshFiles)
     {
@@ -2751,7 +2775,9 @@ void Simulation::ParseMuscle(rapidxml::xml_node<char> * cur)
         ((DampedSpringMuscle *)muscle)->SetArea(Util::Double(buf));
         THROWIFZERO(buf = DoXmlGetProp(cur, "Damping"));
         ((DampedSpringMuscle *)muscle)->SetDamping(Util::Double(buf));
-
+        buf = DoXmlGetProp(cur, "BreakingStrain");
+        if (buf)
+            ((DampedSpringMuscle *)muscle)->SetBreakingStrain(Util::Double(buf));
     }
     else if (strcmp((const char *)buf, "UmbergerGerritsenMartin") == 0)
     {
@@ -3047,12 +3073,11 @@ void Simulation::ParseDriver(rapidxml::xml_node<char> * cur)
         if (strcmp((const char *)buf, "Horizontal") == 0) outputVertical = false;
         else if (strcmp((const char *)buf, "Vertical") == 0) outputVertical = true;
         else throw __LINE__;
-        THROWIFZERO(buf = DoXmlGetProp(cur, "ContactOffset"));
-        Util::Double(buf, 3, m_DoubleList);
-        pgd::Vector contactOffset(m_DoubleList[0], m_DoubleList[1], m_DoubleList[2]);
         THROWIFZERO(buf = DoXmlGetProp(cur, "ReferenceBody"));
         if (m_BodyList.find((const char *)buf) == m_BodyList.end()) throw __LINE__;
         Body *referenceBody = m_BodyList[(const char *)buf];
+        THROWIFZERO(buf = DoXmlGetProp(cur, "ContactOffset"));
+        pgd::Vector contactOffset = TegotaeDriver::ParseContactOffset(buf, this, referenceBody->GetName()->c_str());
         THROWIFZERO(buf = DoXmlGetProp(cur, "ContactGeom"));
         Geom *contactGeom = m_GeomList[(const char *)buf];
         if (m_GeomList.find((const char *)buf) == m_GeomList.end()) throw __LINE__;
@@ -3432,10 +3457,10 @@ void Simulation::ParseController(rapidxml::xml_node<char> * cur)
     if (strcmp((const char *)buf, "PIDMuscleLength") == 0)
     {
         PIDMuscleLength *pidMuscleLength = new PIDMuscleLength();
-        pidMuscleLength->Driver::setSimulation(this);
+        pidMuscleLength->setSimulation(this);
         THROWIFZERO(buf = DoXmlGetProp(cur, "ID"));
         m_ControllerList[(const char *)buf] = pidMuscleLength;
-        pidMuscleLength->Driver::SetName((const char *)buf);
+        pidMuscleLength->SetName((const char *)buf);
 
         THROWIFZERO(buf = DoXmlGetProp(cur, "MuscleID"));
         pidMuscleLength->SetMuscle(m_MuscleList[(const char *)buf]);
@@ -3467,10 +3492,10 @@ void Simulation::ParseController(rapidxml::xml_node<char> * cur)
     else if (strcmp((const char *)buf, "PIDTargetMatch") == 0)
     {
         PIDTargetMatch *pidTargetMatch = new PIDTargetMatch();
-        pidTargetMatch->Driver::setSimulation(this);
+        pidTargetMatch->setSimulation(this);
         THROWIFZERO(buf = DoXmlGetProp(cur, "ID"));
         m_ControllerList[(const char *)buf] = pidTargetMatch;
-        pidTargetMatch->Driver::SetName((const char *)buf);
+        pidTargetMatch->SetName((const char *)buf);
 
         THROWIFZERO(buf = DoXmlGetProp(cur, "MuscleID"));
         pidTargetMatch->SetMuscle(m_MuscleList[(const char *)buf]);
@@ -3502,10 +3527,10 @@ void Simulation::ParseController(rapidxml::xml_node<char> * cur)
     else if (strcmp((const char *)buf, "PIDErrorIn") == 0)
     {
         PIDErrorInController *pidErrorInController = new PIDErrorInController();
-        pidErrorInController->Driver::setSimulation(this);
+        pidErrorInController->setSimulation(this);
         THROWIFZERO(buf = DoXmlGetProp(cur, "ID"));
         m_ControllerList[(const char *)buf] = pidErrorInController;
-        pidErrorInController->Driver::SetName((const char *)buf);
+        pidErrorInController->SetName((const char *)buf);
         THROWIFZERO(buf = DoXmlGetProp(cur, "TargetID"));
         if (m_MuscleList.find((const char *)buf) != m_MuscleList.end()) pidErrorInController->SetTarget(m_MuscleList[(const char *)buf]);
         else if (m_ControllerList.find((const char *)buf) != m_ControllerList.end()) pidErrorInController->SetTarget(m_ControllerList[(const char *)buf]);
@@ -4104,15 +4129,15 @@ void Simulation::OutputProgramState()
                 jpu->GetUniversalAnchor(v);
                 dBodyGetPosRelPoint(body->GetBodyID(), v[0], v[1], v[2], result);
                 sprintf(m_Buffer, "%s %.17e %.17e %.17e", body->GetName()->c_str(), result[0], result[1], result[2]);
-                newAttr = DoXmlReplaceProp(newNode, "UniversalAnchor", m_Buffer);
+                newAttr = DoXmlReplaceProp(newNode, "Body2UniversalAnchor", m_Buffer);
                 jpu->GetUniversalAxis1(v);
                 dBodyVectorFromWorld(body->GetBodyID(), v[0], v[1], v[2], result);
                 sprintf(m_Buffer, "%s %.17e %.17e %.17e", body->GetName()->c_str(), result[0], result[1], result[2]);
-                newAttr = DoXmlReplaceProp(newNode, "UniversalAxis1", m_Buffer);
+                newAttr = DoXmlReplaceProp(newNode, "Body2UniversalAxis1", m_Buffer);
                 jpu->GetUniversalAxis2(v);
                 dBodyVectorFromWorld(body->GetBodyID(), v[0], v[1], v[2], result);
                 sprintf(m_Buffer, "%s %.17e %.17e %.17e", body->GetName()->c_str(), result[0], result[1], result[2]);
-                newAttr = DoXmlReplaceProp(newNode, "UniversalAxis2", m_Buffer);
+                newAttr = DoXmlReplaceProp(newNode, "Body2UniversalAxis2", m_Buffer);
             }
 
             FixedJoint *jpf = dynamic_cast<FixedJoint *>(joint);
@@ -4188,17 +4213,26 @@ void Simulation::OutputProgramState()
                 if (m_ModelStateRelative)
                 {
                     sprintf(m_Buffer, "%s %.17e %.17e %.17e", body->GetName()->c_str(),  p[0], p[1], p[2]);
+                    newAttr = DoXmlReplaceProp(newNode, "Position", m_Buffer);
+                    dQuaternion q;
+                    geom->GetQuaternion(q);
+                    sprintf(m_Buffer, "%s %.17e %.17e %.17e %.17e", body->GetName()->c_str(), q[0], q[1], q[2], q[3]);
+                    newAttr = DoXmlReplaceProp(newNode, "Quaternion", m_Buffer);
                 }
                 else
                 {
                     dBodyGetRelPointPos (geom->GetBody(), p[0], p[1], p[2], result);
                     sprintf(m_Buffer, "%s %.17e %.17e %.17e", "World", result[0], result[1], result[2]);
+                    newAttr = DoXmlReplaceProp(newNode, "Position", m_Buffer);
+                    dQuaternion q;
+                    geom->GetQuaternion(q);
+                    pgd::Quaternion geomQuaternion(q[0], q[1], q[2], q[3]);
+                    const double *bodyRotation = dBodyGetQuaternion(body->GetBodyID());
+                    pgd::Quaternion bodyQuaternion(bodyRotation[0], bodyRotation[1], bodyRotation[2], bodyRotation[3]);
+                    pgd::Quaternion worldRotation = bodyQuaternion * geomQuaternion;
+                    sprintf(m_Buffer, "%s %.17e %.17e %.17e %.17e", "World", worldRotation.n, worldRotation.v.x, worldRotation.v.y, worldRotation.v.z);
+                    newAttr = DoXmlReplaceProp(newNode, "Quaternion", m_Buffer);
                 }
-                newAttr = DoXmlReplaceProp(newNode, "Position", m_Buffer);
-                dQuaternion q;
-                geom->GetQuaternion(q);
-                sprintf(m_Buffer, "%s %.17e %.17e %.17e %.17e", body->GetName()->c_str(), q[0], q[1], q[2], q[3]);
-                newAttr = DoXmlReplaceProp(newNode, "Quaternion", m_Buffer);
             }
             outputFile << (*currentNode) << "\n";
         }
@@ -4630,34 +4664,44 @@ void Simulation::NearCallback(void *data, dGeomID o1, dGeomID o2)
     {
         for (i = 0; i < numc; i++)
         {
-            dJointID c = dJointCreateContact(s->m_WorldID, s->m_ContactGroup, contact + i);
-            dJointAttach(c, b1, b2);
-
             if (((Geom *)dGeomGetData(o1))->GetAbort()) s->SetContactAbort(true);
             if (((Geom *)dGeomGetData(o2))->GetAbort()) s->SetContactAbort(true);
-
-            myContact = new Contact();
-            myContact->setSimulation(s);
-            dJointSetFeedback(c, myContact->GetJointFeedback());
-            myContact->SetJointID(c);
-            memcpy(myContact->GetContactPosition(), contact[i].geom.pos, sizeof(dVector3));
-            s->m_ContactList.push_back(myContact);
-            // only add the contact information once
-            // and add it to the non-environment geom
-            if (((Geom *)dGeomGetData(o1))->GetGeomLocation() == Geom::environment)
-                ((Geom *)dGeomGetData(o2))->AddContact(myContact);
-            else
-                ((Geom *)dGeomGetData(o1))->AddContact(myContact);
-#ifdef USE_QT
-            if (s->GetLoadMeshFiles())
+            dJointID c;
+            if (((Geom *)dGeomGetData(o1))->GetAdhesion() == false && ((Geom *)dGeomGetData(o2))->GetAdhesion() == false)
             {
-                myContact->SetAxisSize(s->m_DefaultContact->GetAxisSize());
-                myContact->SetColour(s->m_DefaultContact->GetColour());
-                myContact->SetForceRadius(s->m_DefaultContact->GetForceRadius());
-                myContact->SetForceScale(s->m_DefaultContact->GetForceScale());
-                myContact->SetDrawContactForces(s->m_drawContactForces);
+                c = dJointCreateContact(s->m_WorldID, s->m_ContactGroup, contact + i);
+                dJointAttach(c, b1, b2);
+                myContact = new Contact();
+                myContact->setSimulation(s);
+                dJointSetFeedback(c, myContact->GetJointFeedback());
+                myContact->SetJointID(c);
+                memcpy(myContact->GetContactPosition(), contact[i].geom.pos, sizeof(dVector3));
+                s->m_ContactList.push_back(myContact);
+                // only add the contact information once
+                // and add it to the non-environment geom
+                if (((Geom *)dGeomGetData(o1))->GetGeomLocation() == Geom::environment)
+                    ((Geom *)dGeomGetData(o2))->AddContact(myContact);
+                else
+                    ((Geom *)dGeomGetData(o1))->AddContact(myContact);
+    #ifdef USE_QT
+                if (s->GetLoadMeshFiles())
+                {
+                    myContact->SetAxisSize(s->m_DefaultContact->GetAxisSize());
+                    myContact->SetColour(s->m_DefaultContact->GetColour());
+                    myContact->SetForceRadius(s->m_DefaultContact->GetForceRadius());
+                    myContact->SetForceScale(s->m_DefaultContact->GetForceScale());
+                    myContact->SetDrawContactForces(s->m_drawContactForces);
+                }
+    #endif
             }
-#endif
+            else
+            {
+                // for adhesive joints we don't create temporary contacts, we create permanent ball joints
+                c = dJointCreateBall(s->m_WorldID, nullptr);
+                dJointAttach(c, b1, b2);
+                dJointSetBallAnchor(c, contact[i].geom.pos[0], contact[i].geom.pos[1], contact[i].geom.pos[2]);
+            }
+
         }
     }
     delete [] contact;
@@ -4852,6 +4896,9 @@ void Simulation::Dump()
 
     std::map<std::string, Reporter *>::const_iterator ReporterIter;
     for (ReporterIter = m_ReporterList.begin(); ReporterIter != m_ReporterList.end(); ReporterIter++) ReporterIter->second->Dump();
+
+    std::map<std::string, Controller *>::const_iterator ControllerIter;
+    for (ControllerIter = m_ControllerList.begin(); ControllerIter != m_ControllerList.end(); ControllerIter++) ControllerIter->second->Dump();
 
     std::map<std::string, Warehouse *>::const_iterator WarehouseIter;
     for (WarehouseIter = m_WarehouseList.begin(); WarehouseIter != m_WarehouseList.end(); WarehouseIter++) WarehouseIter->second->Dump();

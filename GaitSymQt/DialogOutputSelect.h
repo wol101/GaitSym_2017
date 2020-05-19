@@ -30,6 +30,7 @@ public:
     QListWidget *listWidgetJoint;
     QListWidget *listWidgetMuscle;
     QListWidget *listWidgetReporter;
+    QListWidget *listWidgetController;
     QListWidget *listWidgetWarehouse;
 
 
@@ -44,6 +45,7 @@ public slots:
     void menuRequestDriver(QPoint);
     void menuRequestDataTarget(QPoint);
     void menuRequestReporter(QPoint);
+    void menuRequestController(QPoint);
     void menuRequestWarehouse(QPoint);
     void acceptButtonClicked();
     void rejectButtonClicked();

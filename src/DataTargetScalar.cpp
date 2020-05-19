@@ -298,9 +298,7 @@ double DataTargetScalar::GetError(int index)
         switch (m_DataType)
         {
         case DriverError:
-            double X = tegotaeDriver->X();
-            double Y = tegotaeDriver->Y();
-            errorScore = sqrt(X*X + Y*Y) - m_ValueList[index];
+            errorScore = tegotaeDriver->GetValue(m_simulation->GetTime()) - m_ValueList[index];
             break;
         }
     }

@@ -51,6 +51,9 @@ public:
     double Y() const;
     double N() const;
 
+    // utility
+    static pgd::Vector ParseContactOffset(const char *buf, Simulation *simulation, const char *referenceBodyID);
+
 protected:
 
     // these are the parameters from the paper Owaki D, Kano T, Nagasawa K, Tero A, Ishiguro A. 2012 Simple robot suggests physical interlimb communication is essential for quadruped walking. J R Soc Interface 20120669

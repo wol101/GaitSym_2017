@@ -1124,6 +1124,7 @@ int ReadModel(void *userData)
     if (gMungeModelStateFlag) gSimulation->SetMungeModelStateFlag(true);
     if (gMungeRotationFlag) gSimulation->SetMungeRotationFlag(true);
     gSimulation->SetModelStateRelative(gModelStateRelative);
+    gSimulation->SetDisplaySkip(gDisplaySkip);
 
 #ifdef USE_QT
     gSimulation->SetMainWindow(static_cast<MainWindow *>(userData));

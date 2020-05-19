@@ -23,6 +23,7 @@ Muscle::Muscle(Strap *strap)
     m_ElasticEnergyColourFullScale = 50.0;
     m_drawMuscleForces = false;
     m_elasticDisplay = false;
+    m_activationDisplay = false;
 #endif
 }
 

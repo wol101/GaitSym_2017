@@ -50,7 +50,7 @@ TegotaeDriver::TegotaeDriver()
     m_output = 0;                    // the output value of the controller
 
 #ifdef USE_QT
-    m_Radius = 0.1;
+    m_Radius = 0.01;
 #endif
 }
 
@@ -131,6 +131,55 @@ void TegotaeDriver::UpdateReactionForce()
     if (m_N < 0) m_N = 0;
 }
 
+pgd::Vector TegotaeDriver::ParseContactOffset(const char *buf, Simulation *simulation, const char *referenceBodyID)
+{
+    size_t l = strlen(buf);
+    char *lBuf = reinterpret_cast<char *>(alloca((l + 1) * sizeof(char)));
+    char **lBufPtrs = reinterpret_cast<char **>(alloca(l * sizeof(char *)));
+    strcpy(lBuf, buf);
+    long count = DataFile::ReturnTokens(lBuf, lBufPtrs, long(l));
+
+    pgd::Vector v;
+    pgd::Vector v2;
+    if (count < 3 || count > 4) return v;
+    if (count == 3)
+    {
+        v.x = strtod(lBufPtrs[0], 0);
+        v.y = strtod(lBufPtrs[1], 0);
+        v.z = strtod(lBufPtrs[2], 0);
+        return v;
+    }
+    if (!simulation || !referenceBodyID) return v;
+    if (strcmp(lBufPtrs[0], "World") == 0)
+    {
+        Body *theBody = simulation->GetBody(referenceBodyID);
+        if (theBody == 0) return v;
+        v2.x = strtod(lBufPtrs[1], 0);
+        v2.y = strtod(lBufPtrs[2], 0);
+        v2.z = strtod(lBufPtrs[3], 0);
+        dVector3 bodyRelativeCoordinates;
+        dBodyGetPosRelPoint(theBody->GetBodyID(), v2.x, v2.y, v2.z, bodyRelativeCoordinates);
+        v.x = bodyRelativeCoordinates[0];
+        v.y = bodyRelativeCoordinates[1];
+        v.z = bodyRelativeCoordinates[2];
+        return v;
+    }
+    Body *theBody = simulation->GetBody(lBufPtrs[0]);
+    if (theBody == 0) return v;
+    v2.x = strtod(lBufPtrs[1], 0);
+    v2.y = strtod(lBufPtrs[2], 0);
+    v2.z = strtod(lBufPtrs[3], 0);
+    dVector3 worldCoordinates;
+    dBodyGetRelPointPos (theBody->GetBodyID(), v2.x, v2.y, v2.z, worldCoordinates);
+    theBody = simulation->GetBody(referenceBodyID);
+    if (theBody == 0) return v;
+    dVector3 bodyRelativeCoordinates;
+    dBodyGetPosRelPoint(theBody->GetBodyID(), worldCoordinates[0], worldCoordinates[1], worldCoordinates[2], bodyRelativeCoordinates);
+    v.x = bodyRelativeCoordinates[0];
+    v.y = bodyRelativeCoordinates[1];
+    v.z = bodyRelativeCoordinates[2];
+    return v;
+}
 
 void TegotaeDriver::Dump()
 {
@@ -141,8 +190,8 @@ void TegotaeDriver::Dump()
         m_FirstDump = false;
         if (m_DumpStream == 0)
         {
-            if (Driver::m_Name.size() == 0) std::cerr << "TegotaeDriver::Dump error: can only dump a named object\n";
-            std::string filename(Driver::m_Name);
+            if (m_Name.size() == 0) std::cerr << "TegotaeDriver::Dump error: can only dump a named object\n";
+            std::string filename(m_Name);
             filename.append(".dump");
             m_DumpStream = new std::ofstream(filename.c_str());
             m_DumpStream->precision(17);

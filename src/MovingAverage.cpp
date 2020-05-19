@@ -24,8 +24,12 @@ MovingAverage::MovingAverage() : Filter()
 
 MovingAverage::MovingAverage(int window)  : Filter()
 {
-    m_buffer = 0;
-    InitialiseBuffer(window);
+    m_window = window;
+    m_buffer = new double[m_window];
+    std::fill_n(m_buffer, m_window, 0);
+    m_index = 0;
+    m_sum = 0;
+    m_average = 0;
 }
 
 MovingAverage::~MovingAverage()

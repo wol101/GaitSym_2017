@@ -100,33 +100,33 @@ ifeq ($(HOST),asl-rocks-cluster.manchester.ac.uk)
 endif
 
 ifeq ($(HOST),submitter.itservices.manchester.ac.uk)
-        #CXXFLAGS = -static -ffast-math -O3 -DEXPERIMENTAL
-        CXXFLAGS = -static -O3 -ffast-math -DEXPERIMENTAL \
-        -DdIDEDOUBLE -DTRIMESH_ENABLED -DTRIMESH_OPCODE -DCCD_IDEDOUBLE -DdLIBCCD_ENABLED -DdTHREADING_INTF_DISABLED \
-        -DRAPIDXML_NO_EXCEPTIONS -DBYTE_ORDER=LITTLE_ENDIAN -DHAVE_MALLOC_H -DUSE_UNIX_ERRORS
-        LDFLAGS  = -static 
-        # condor_compile is tricky with pthread so best avoided and just use vanilla universe
-        # CXX      = condor_compile g++
-        # CC       = condor_compile gcc
-        CXX      = g++
-        CC       = gcc
-        LIBS = -lpthread -lm
-        INC_DIRS = -Irapidxml-1.13 -Iexprtk -Iode-0.15/ode/src -Iode-0.15/libccd/src -Iode-0.15/OPCODE -Iode-0.15/include -Iann_1.1.2/include
+	#CXXFLAGS = -static -ffast-math -O3 -std=c++11 -DEXPERIMENTAL
+	CXXFLAGS = -static -O3 -ffast-math -std=c++11 -DEXPERIMENTAL \
+	-DdIDEDOUBLE -DTRIMESH_ENABLED -DTRIMESH_OPCODE -DCCD_IDEDOUBLE -DdLIBCCD_ENABLED -DdTHREADING_INTF_DISABLED \
+	-DRAPIDXML_NO_EXCEPTIONS -DBYTE_ORDER=LITTLE_ENDIAN -DHAVE_MALLOC_H -DUSE_UNIX_ERRORS
+	LDFLAGS  = -static 
+	# condor_compile is tricky with pthread so best avoided and just use vanilla universe
+	# CXX      = condor_compile g++
+	# CC       = condor_compile gcc
+	CXX      = g++
+	CC       = gcc
+	LIBS = -lpthread -lm
+	INC_DIRS = -Irapidxml-1.13 -Iexprtk -Iode-0.15/ode/src -Iode-0.15/libccd/src -Iode-0.15/OPCODE -Iode-0.15/include -Iann_1.1.2/include
 endif
 
 ifeq ($(HOST),l-u-roboticssuite.it.manchester.ac.uk)
-        #CXXFLAGS = -static -ffast-math -O3 -DEXPERIMENTAL
-        CXXFLAGS = -O3 -ffast-math -DEXPERIMENTAL \
-        -DdIDEDOUBLE -DTRIMESH_ENABLED -DTRIMESH_OPCODE -DCCD_IDEDOUBLE -DdLIBCCD_ENABLED -DdTHREADING_INTF_DISABLED \
-        -DRAPIDXML_NO_EXCEPTIONS -DBYTE_ORDER=LITTLE_ENDIAN -DHAVE_MALLOC_H -DUSE_UNIX_ERRORS
-        LDFLAGS  = 
-        # condor_compile is tricky with pthread so best avoided and just use vanilla universe
-        # CXX      = condor_compile g++
-        # CC       = condor_compile gcc
-        CXX      = g++
-        CC       = gcc
-        LIBS = -lpthread -lm
-        INC_DIRS = -Irapidxml-1.13 -Iexprtk -Iode-0.15/ode/src -Iode-0.15/libccd/src -Iode-0.15/OPCODE -Iode-0.15/include -Iann_1.1.2/include
+	#CXXFLAGS = -static -ffast-math -O3 -DEXPERIMENTAL
+	CXXFLAGS = -O3 -ffast-math -std=c++11 -DEXPERIMENTAL \
+	-DdIDEDOUBLE -DTRIMESH_ENABLED -DTRIMESH_OPCODE -DCCD_IDEDOUBLE -DdLIBCCD_ENABLED -DdTHREADING_INTF_DISABLED \
+	-DRAPIDXML_NO_EXCEPTIONS -DBYTE_ORDER=LITTLE_ENDIAN -DHAVE_MALLOC_H -DUSE_UNIX_ERRORS
+	LDFLAGS  = 
+	# condor_compile is tricky with pthread so best avoided and just use vanilla universe
+	# CXX      = condor_compile g++
+	# CC       = condor_compile gcc
+	CXX      = g++
+	CC       = gcc
+	LIBS = -lpthread -lm
+	INC_DIRS = -Irapidxml-1.13 -Iexprtk -Iode-0.15/ode/src -Iode-0.15/libccd/src -Iode-0.15/OPCODE -Iode-0.15/include -Iann_1.1.2/include
 endif
 
 # vpath %.cpp src

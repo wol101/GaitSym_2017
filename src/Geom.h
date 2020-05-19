@@ -52,23 +52,26 @@ public:
     void GetWorldQuaternion(dQuaternion q);
 
 
-    void SetGeomLocation(GeomLocation l) { m_GeomLocation = l; };
-    GeomLocation GetGeomLocation() { return m_GeomLocation; };
+    void SetGeomLocation(GeomLocation l) { m_GeomLocation = l; }
+    GeomLocation GetGeomLocation() { return m_GeomLocation; }
 
-    void SetContactSoftCFM(double cfm) { m_CFM = cfm; };
-    double GetContactSoftCFM() { return m_CFM; };
-    void SetContactSoftERP(double erp) { m_ERP = erp; };
-    double GetContactSoftERP() { return m_ERP; };
-    void SetContactMu(double mu) { m_Mu = mu; };
-    double GetContactMu() { return m_Mu; };
-    void SetContactBounce(double bounce) { m_Bounce = bounce; };
-    double GetContactBounce() { return m_Bounce; };
+    void SetContactSoftCFM(double cfm) { m_CFM = cfm; }
+    double GetContactSoftCFM() { return m_CFM; }
+    void SetContactSoftERP(double erp) { m_ERP = erp; }
+    double GetContactSoftERP() { return m_ERP; }
+    void SetContactMu(double mu) { m_Mu = mu; }
+    double GetContactMu() { return m_Mu; }
+    void SetContactBounce(double bounce) { m_Bounce = bounce; }
+    double GetContactBounce() { return m_Bounce; }
 
     void SetSpringDamp(double springConstant, double dampingConstant, double integrationStep);
     void SetSpringERP(double springConstant, double ERP, double integrationStep);
 
-    void SetAbort(bool abort) { m_Abort = abort; };
-    bool GetAbort() { return m_Abort; };
+    void SetAbort(bool abort) { m_Abort = abort; }
+    bool GetAbort() { return m_Abort; }
+
+    void SetAdhesion(bool adhesion) { m_Adhesion = adhesion; }
+    bool GetAdhesion() { return m_Adhesion; }
 
     void AddContact(Contact *contact) { m_ContactList.push_back(contact); }
     std::vector<Contact *> *GetContactList() { return &m_ContactList; }
@@ -92,6 +95,7 @@ protected:
     double m_Bounce;
 
     bool m_Abort;
+    bool m_Adhesion;
 
     std::vector<Contact *> m_ContactList;
 };

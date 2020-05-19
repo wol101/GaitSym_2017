@@ -8,6 +8,9 @@
  */
 
 #include "PIDErrorInController.h"
+#include "Simulation.h"
+
+#include <fstream>
 
 #define RANGE(x, l, h) if (x < (l)) x = (l); if (x > (h)) x = (h);
 
@@ -48,8 +51,7 @@ double PIDErrorInController::GetValue(double time)
     m_LastTime = time;
 
     // in this driver, the error is driven by the upstream driver
-    SumDrivers(time);
-    m_error = GetCurrentDriverSum();
+    m_error = SumDrivers(time);
 
     // do the PID calculations
     m_integral = m_integral + (m_error * m_dt);
@@ -68,3 +70,41 @@ double PIDErrorInController::GetValue(double time)
 //{
 //    m_outputIsDelta = outputIsDelta;
 //}
+
+void PIDErrorInController::Dump()
+{
+    if (m_Dump == false) return;
+
+    if (m_FirstDump)
+    {
+        m_FirstDump = false;
+        if (m_DumpStream == nullptr)
+        {
+            if (m_Name.size() == 0) std::cerr << "NamedObject::Dump error: can only dump a named object\n";
+            std::string filename(m_Name);
+            filename.append(".dump");
+            m_DumpStream = new std::ofstream(filename.c_str());
+            m_DumpStream->precision(17);
+        }
+        if (m_DumpStream)
+        {
+            *m_DumpStream << "Time\tKp\tKi\tKd\tprevious_error\terror\tintegral\tderivative\toutput\tdt\n";
+        }
+    }
+
+    if (m_DumpStream)
+    {
+        *m_DumpStream << m_simulation->GetTime() <<
+                         "\t" << m_Kp <<
+                         "\t" << m_Ki <<
+                         "\t" << m_Kd <<
+                         "\t" << m_previous_error <<
+                         "\t" << m_error <<
+                         "\t" << m_integral <<
+                         "\t" << m_derivative <<
+                         "\t" << m_output <<
+                         "\t" << m_dt <<
+                         "\n";
+    }
+}
+

@@ -16,7 +16,7 @@
 #include <vector>
 #include <string>
 
-class Muscle:public Drivable
+class Muscle: public NamedObject, public Drivable
 {
 public:
 
