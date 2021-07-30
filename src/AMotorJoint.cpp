@@ -27,6 +27,11 @@ AMotorJoint::AMotorJoint(dWorldID worldID) : Joint()
 
     dJointSetFeedback(m_JointID, &m_JointFeedback);
 
+ #ifdef EXPERIMENTAL
+    m_dynamicFrictionIntercept = 0;
+    m_dynamicFrictionSlope = 0;
+    m_dynamicFrictionFlag = false;
+#endif
 
 }
 
@@ -61,6 +66,17 @@ void AMotorJoint::SetMaxTorque(double maximumTorque)
     dJointSetAMotorParam(m_JointID, dParamFMax, maximumTorque);
 }
 
+#ifdef EXPERIMENTAL
+void AMotorJoint::SetDynamicFriction(double dynamicFrictionIntercept, double dynamicFrictionSlope)
+{
+    m_dynamicFrictionIntercept = dynamicFrictionIntercept;
+    m_dynamicFrictionSlope = dynamicFrictionSlope;
+    m_dynamicFrictionFlag = true;
+
+    SetTargetVelocity(0);
+    SetDynamicFriction();
+}
+#endif
 
 // get the axis angular rate
 double AMotorJoint::GetAngleRate()
@@ -234,10 +250,22 @@ void AMotorJoint::SetAngle()
     dJointSetAMotorAngle(m_JointID, 0, angle);
 }
 
+#ifdef EXPERIMENTAL
+void AMotorJoint::SetDynamicFriction()
+{
+    double maximumTorque;
+    maximumTorque = m_dynamicFrictionIntercept + m_dynamicFrictionSlope * fabs(GetAngleRate());
+
+    SetMaxTorque(maximumTorque);
+}
+#endif
 
 void AMotorJoint::Update()
 {
     SetAngle();
+#ifdef EXPERIMENTAL
+    if (m_dynamicFrictionFlag) SetDynamicFriction();
+#endif
 }
 
 void AMotorJoint::Dump()

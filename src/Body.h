@@ -73,6 +73,11 @@ public:
     void SetAngularDampingThreshold(double threshold);
     void SetMaxAngularSpeed(double max_speed);
 
+#ifdef EXPERIMENTAL
+    void SetCylinderDragParameters(DragControl dragAxis, double dragFluidDensity, double dragCylinderMin, double dragCylinderMax, double dragCylinderRadius, double dragCylinderCoefficient);
+    void SetDirectDragCoefficients(double linearDragCoefficientX, double linearDragCoefficientY, double linearDragCoefficientZ,
+                                   double rotationalDragCoefficientX, double rotationalDragCoefficientY, double rotationalDragCoefficientZ);
+#endif
 
     const double *GetPosition();
     const double *GetQuaternion();
@@ -95,6 +100,9 @@ public:
     LimitTestResult TestLimits();
     int SanityCheck(Body *otherBody, AxisType axis, const std::string &sanityCheckLeft, const std::string &sanityCheckRight);
 
+#ifdef EXPERIMENTAL
+    void ComputeDrag();
+#endif
 
     // Utility
     void ParallelAxis(dMass *massProperties, const double *translation, const double *quaternion, dMass *newMassProperties);
@@ -128,6 +136,15 @@ protected:
 
     dVector3 m_Offset;
 
+#ifdef EXPERIMENTAL
+    DragControl m_dragControl;
+    double m_dragCoefficients[6];
+    double m_dragFluidDensity;
+    double m_dragCylinderMin;
+    double m_dragCylinderLength;
+    double m_dragCylinderRadius;
+    double m_dragCylinderCoefficient;
+#endif
 
 };
 

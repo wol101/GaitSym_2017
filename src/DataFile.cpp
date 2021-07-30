@@ -259,9 +259,9 @@ bool DataFile::ReadFile(const wchar_t * const name)
     wcscpy(m_WPathName, name);
 
     if (m_PathName) delete [] m_PathName;
-    int sizeRequired = WideCharToMultiByte(CP_UTF8, 0, m_WPathName, -1, 0, 0, 0, 0);
-    m_PathName = new char[sizeRequired + 1];
-    WideCharToMultiByte(CP_UTF8, 0, m_WPathName, -1, m_PathName, sizeRequired, 0, 0);
+    int sizeRequired = WideCharToMultiByte(CP_UTF8, 0, m_WPathName, -1, nullptr, 0, nullptr, nullptr);
+    m_PathName = new char[size_t(sizeRequired)];
+    WideCharToMultiByte(CP_UTF8, 0, m_WPathName, -1, m_PathName, sizeRequired, nullptr, nullptr);
 
     if (m_FileData) delete [] m_FileData;
     m_FileData = 0;
@@ -1698,16 +1698,16 @@ bool DataFile::EndsWith(const char *str, const char *suffix)
 #ifdef _WIN32
 char *DataFile::ConvertWideToUTF8(const wchar_t *input)
 {
-    int sizeRequired = WideCharToMultiByte(CP_UTF8, 0, input, -1, 0, 0, 0, 0);
-    char *output = new char[sizeRequired + 1];
-    WideCharToMultiByte(CP_UTF8, 0, input, -1, output, sizeRequired, 0, 0);
+    int sizeRequired = WideCharToMultiByte(CP_UTF8, 0, input, -1, nullptr, 0, nullptr, nullptr);
+    char *output = new char[sizeRequired];
+    WideCharToMultiByte(CP_UTF8, 0, input, -1, output, sizeRequired, nullptr, nullptr);
     return output;
 }
 
 wchar_t *DataFile::ConvertUTF8ToWide(const char *input)
 {
-    int sizeRequired = MultiByteToWideChar(CP_UTF8, 0, input, -1, 0, 0);
-    wchar_t *output = new wchar_t[sizeRequired + 1];
+    int sizeRequired = MultiByteToWideChar(CP_UTF8, 0, input, -1, nullptr, 0);
+    wchar_t *output = new wchar_t[sizeRequired];
     MultiByteToWideChar(CP_UTF8, 0, input, -1, output, sizeRequired);
     return output;
 }

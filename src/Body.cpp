@@ -63,6 +63,14 @@ Body::Body(dWorldID worldID)
 
     SetOffset(0, 0, 0);
 
+#ifdef EXPERIMENTAL
+    m_dragControl = NoDrag;
+    m_dragFluidDensity = 0;
+    m_dragCylinderMin = 0;
+    m_dragCylinderLength = 0;
+    m_dragCylinderRadius = 0;
+    m_dragCylinderCoefficient = 0;
+#endif
 
 #ifdef USE_QT
     m_physRep = 0;
@@ -802,6 +810,172 @@ void Body::SetMaxAngularSpeed(double max_speed)
     dBodySetMaxAngularSpeed(m_BodyID, max_speed);
 }
 
+#ifdef EXPERIMENTAL
+
+void Body::SetCylinderDragParameters(DragControl dragAxis, double dragFluidDensity, double dragCylinderMin, double dragCylinderMax, double dragCylinderRadius, double dragCylinderCoefficient)
+{
+    // drag parameters
+    m_dragControl = dragAxis;
+    m_dragFluidDensity = dragFluidDensity;
+    m_dragCylinderMin = dragCylinderMin;
+    m_dragCylinderLength = dragCylinderMax - dragCylinderMin;
+    m_dragCylinderRadius = dragCylinderRadius;
+    m_dragCylinderCoefficient = dragCylinderCoefficient;
+}
+
+void Body::SetDirectDragCoefficients(double linearDragCoefficientX, double linearDragCoefficientY, double linearDragCoefficientZ,
+                                     double rotationalDragCoefficientX, double rotationalDragCoefficientY, double rotationalDragCoefficientZ)
+{
+    m_dragControl = DragCoefficients;
+    m_dragCoefficients[0] = rotationalDragCoefficientX;
+    m_dragCoefficients[1] = rotationalDragCoefficientY;
+    m_dragCoefficients[2] = rotationalDragCoefficientZ;
+    m_dragCoefficients[3] = linearDragCoefficientX;
+    m_dragCoefficients[4] = linearDragCoefficientY;
+    m_dragCoefficients[5] = linearDragCoefficientZ;
+}
+
+// this routine modifed from Dynamechs 4.0 by Scott McMillan
+void Body::ComputeDrag()
+{
+    static double gqx[4] = {0.069431844,     // Gauss-quadrature constants.
+                           0.330009478,
+                           0.669990521,
+                           0.930568155};
+    static double gqk[4] = {0.1739274225687,
+                           0.3260725774312,
+                           0.3260725774312,
+                           0.1739274225687};
+
+    if (m_dragControl == NoDrag) return;
+    int k;
+
+    double f_D[6] = {0, 0, 0, 0, 0, 0}; // angular follwed by linear
+    double v_rel[6]; // angular follwed by linear
+
+    const double *aVel = dBodyGetAngularVel(m_BodyID);
+    dBodyVectorFromWorld (m_BodyID, aVel[0], aVel[1], aVel[2], v_rel);
+
+    const double *lVel = dBodyGetLinearVel(m_BodyID);
+    dBodyVectorFromWorld (m_BodyID, lVel[0], lVel[1], lVel[2], &(v_rel[3]));
+
+
+    if (m_dragControl == DragCoefficients)
+    {
+        for (k = 0; k < 6; k++)
+        {
+            f_D[k] = -m_dragCoefficients[k]*v_rel[k]*fabs(v_rel[k]);
+        }
+    }
+    else
+    {
+
+        double area = M_PI * m_dragCylinderRadius * m_dragCylinderRadius;
+        double C2 = m_dragFluidDensity * m_dragCylinderCoefficient;
+        double Ca = 0.5 * C2 * area;
+        double C2rl = C2 * m_dragCylinderRadius * m_dragCylinderLength;
+        double vn[3], tem[3];
+        double x, tmp, vn_mag;
+
+        if (m_dragControl == DragCylinderX)
+        {
+            // x-axis moment and force
+            f_D[3] = -Ca*v_rel[3]*fabs(v_rel[3]);
+
+            // y,z components - using Gauss-quadrature
+            for (k = 0; k < 4; k++)
+            {
+                x = m_dragCylinderMin + m_dragCylinderLength*gqx[k];
+                vn[1] = v_rel[4] + v_rel[2]*x;
+                vn[2] = v_rel[5] - v_rel[1]*x;
+
+                vn_mag = sqrt(vn[1]*vn[1] + vn[2]*vn[2]);
+
+                tmp = gqk[k]*vn_mag;
+                tem[1] = tmp*vn[1];
+                tem[2] = tmp*vn[2];
+
+                f_D[1] += (-x*tem[2]);
+                f_D[2] += x*tem[1];
+                f_D[4] += tem[1];
+                f_D[5] += tem[2];
+            }
+            f_D[1] *= -C2rl;
+            f_D[2] *= -C2rl;
+            f_D[4] *= -C2rl;
+            f_D[5] *= -C2rl;
+        }
+
+        else if (m_dragControl == DragCylinderY)
+        {
+            // y-axis moment and force
+            f_D[4] = -Ca*v_rel[4]*fabs(v_rel[4]);
+
+            // z,x components
+            for (k = 0; k < 4; k++)
+            {
+                x = m_dragCylinderMin + m_dragCylinderLength*gqx[k];
+                vn[0] = v_rel[3] - v_rel[2]*x;
+                vn[2] = v_rel[5] + v_rel[0]*x;
+
+                vn_mag = sqrt(vn[2]*vn[2] + vn[0]*vn[0]);
+
+                tmp = gqk[k]*vn_mag;
+                tem[0] = tmp*vn[0];
+                tem[2] = tmp*vn[2];
+
+                f_D[0] += (x*tem[2]);
+                f_D[2] += -x*tem[0];
+                f_D[3] += tem[0];
+                f_D[5] += tem[2];
+            }
+            f_D[0] *= -C2rl;
+            f_D[2] *= -C2rl;
+            f_D[3] *= -C2rl;
+            f_D[5] *= -C2rl;
+
+        }
+
+        else if (m_dragControl == DragCylinderZ)
+        {
+            // z-axis moment and force
+            f_D[5] = -Ca*v_rel[5]*fabs(v_rel[5]);
+
+            // y,x components
+            for (k = 0; k < 4; k++)
+            {
+                x = m_dragCylinderMin + m_dragCylinderLength*gqx[k];
+                vn[0] = v_rel[3] + v_rel[1]*x;
+                vn[1] = v_rel[4] - v_rel[0]*x;
+
+                vn_mag = sqrt(vn[1]*vn[1] + vn[0]*vn[0]);
+
+                tmp = gqk[k]*vn_mag;
+                tem[0] = tmp*vn[0];
+                tem[1] = tmp*vn[1];
+
+                f_D[0] += (-x*tem[1]);
+                f_D[1] += x*tem[0];
+                f_D[3] += tem[0];
+                f_D[4] += tem[1];
+            }
+            f_D[0] *= -C2rl;
+            f_D[1] *= -C2rl;
+            f_D[3] *= -C2rl;
+            f_D[4] *= -C2rl;
+
+        }
+
+    }
+
+    // drag forces are now in f_D (3 rotational followed by 3 linear)
+    // need to add them to the body
+    dBodyAddRelTorque(m_BodyID, f_D[0], f_D[1], f_D[2]);
+    dBodyAddRelForce(m_BodyID, f_D[3], f_D[4], f_D[5]);
+
+}
+
+#endif
 
 #ifdef USE_QT
 
@@ -888,6 +1062,20 @@ void Body::WriteToXMLStream(std::ostream &outputStream)
     outputStream << " AngularDampingThreshold=\"" << dBodyGetAngularDampingThreshold(m_BodyID) << "\"";
     outputStream << " MaxAngularSpeed=\"" << dBodyGetMaxAngularSpeed(m_BodyID) << "\"";
 
+#ifdef EXPERIMENTAL
+    if (m_dragControl == NoDrag) outputStream << " DragControl=\"" << "NoDrag" << "\"";
+    if (m_dragControl == DragCoefficients) outputStream << " DragControl=\"" << "DragCoefficients" << "\"";
+    if (m_dragControl == DragCylinderX) outputStream << " DragControl=\"" << "DragCylinderX" << "\"";
+    if (m_dragControl == DragCylinderY) outputStream << " DragControl=\"" << "DragCylinderY" << "\"";
+    if (m_dragControl == DragCylinderZ) outputStream << " DragControl=\"" << "DragCylinderZ" << "\"";
+    outputStream << " DirectDragCoefficients=\"" << m_dragCoefficients[0] << " " << m_dragCoefficients[1] << " " << m_dragCoefficients[2] << " "
+                 << m_dragCoefficients[3] << " " << m_dragCoefficients[4] << " " << m_dragCoefficients[5] << "\"";
+    outputStream << " DragFluidDensity=\"" << m_dragFluidDensity << "\"";
+    outputStream << " DragCylinderMin=\"" << m_dragCylinderMin << "\"";
+    outputStream << " DragCylinderMax=\"" << m_dragCylinderLength + m_dragCylinderMin << "\"";
+    outputStream << " DragCylinderRadius=\"" << m_dragCylinderRadius << "\"";
+    outputStream << " DragCylinderCoefficient=\"" << m_dragCylinderCoefficient << "\"";
+#endif
 
     /*
 #ifdef USE_QT

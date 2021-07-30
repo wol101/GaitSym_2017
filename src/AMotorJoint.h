@@ -23,6 +23,9 @@ public:
     void SetAxis(const char *buf);
     void SetTargetVelocity(double targetVelocity);
     void SetMaxTorque(double maximumTorque);
+ #ifdef EXPERIMENTAL
+    void SetDynamicFriction(double dynamicFrictionIntercept, double dynamicFrictionSlope);
+#endif
 
     double GetAngle();
     double GetAngleRate();
@@ -37,6 +40,13 @@ public:
 protected:
 
     void SetAngle();
+#ifdef EXPERIMENTAL
+    void SetDynamicFriction();
+
+    double m_dynamicFrictionIntercept;
+    double m_dynamicFrictionSlope;
+    bool m_dynamicFrictionFlag;
+#endif
 };
 
 

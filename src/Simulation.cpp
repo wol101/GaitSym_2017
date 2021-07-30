@@ -509,6 +509,25 @@ void Simulation::UpdateSimulation()
     {
         if (m_FitnessType == ClosestWarehouse)
         {
+#ifdef EXPERIMENTAL
+            std::map<std::string, Warehouse *>::const_iterator warehouseIter = m_WarehouseList.find(m_CurrentWarehouse);
+            if (warehouseIter != m_WarehouseList.end())
+            {
+                WarehouseUnit *warehouseUnit = warehouseIter->second->GetWarehouseUnit(0); // only interested in the warehouse unit 0 for this measurement
+                warehouseUnit->SetBodyQueryData(m_BodyList);
+                warehouseUnit->DoSearch();
+                m_WarehouseDistance = warehouseUnit->GetNearestNeighbourDistance();
+#ifdef TOTAL_DISTANCE_WAREHOUSE_METRIC // this version calculates a total distance from warehouse metric
+                if (m_WarehouseDistance < m_WarehouseUnitIncreaseDistanceThreshold) m_ClosestWarehouseFitness += (m_WarehouseUnitIncreaseDistanceThreshold - m_WarehouseDistance);
+#else // and this is a minimum distance metric
+                if (m_WarehouseDistance < std::fabs(m_ClosestWarehouseFitness))
+                {
+                    m_ClosestWarehouseFitness = -m_WarehouseDistance; // negative because we always try and maximise the value
+                    std::cerr << m_SimulationTime << " m_ClosestWarehouseFitness=" << m_ClosestWarehouseFitness << "\n";
+                }
+#endif
+            }
+#endif
         }
         else if (m_FitnessType == KinematicMatch || m_FitnessType == KinematicMatchMiniMax)
         {
@@ -572,6 +591,29 @@ void Simulation::UpdateSimulation()
     for (GeomIter = m_GeomList.begin(); GeomIter != m_GeomList.end(); GeomIter++) GeomIter->second->ClearContacts();
     dSpaceCollide(m_SpaceID, this, &NearCallback);
 
+#ifdef EXPERIMENTAL
+    std::map<std::string, Warehouse *>::const_iterator warehouseIter = m_WarehouseList.find(m_CurrentWarehouse);
+    if (warehouseIter != m_WarehouseList.end() && m_FitnessType != ClosestWarehouse)
+    {
+        warehouseIter->second->DoSearch(m_BodyList);
+        m_WarehouseDistance = warehouseIter->second->GetNearestNeighbourDistance();
+        std::vector<std::string> *driverNames = warehouseIter->second->GetDriverNames();
+        double *activations = warehouseIter->second->GetCurrentActivations();
+        for (unsigned int iDriver = 0; iDriver < driverNames->size(); iDriver++)
+        {
+            FixedDriver *driver = dynamic_cast<FixedDriver *>(m_DriverList[driverNames->at(iDriver)]);
+            if (driver)
+            {
+                driver->SetValue(activations[iDriver]);
+            }
+            else
+            {
+                std::cerr << "Only FixedDriver currently supported as warehouse targets\n";
+            }
+        std::cerr << m_SimulationTime << " m_WarehouseDistance=" << m_WarehouseDistance << "\n";
+        }
+    }
+#endif
 
 //    if (activationsDone == false)
 //    {
@@ -639,6 +681,12 @@ void Simulation::UpdateSimulation()
     std::map<std::string, Joint *>::const_iterator jointIter;
     for (jointIter = m_JointList.begin(); jointIter != m_JointList.end(); jointIter++) jointIter->second->Update();
 
+#ifdef EXPERIMENTAL
+    // update the bodies (needed for drag calculations)
+    std::map<std::string, Body *>::const_iterator bodyIter;
+    for (bodyIter = m_BodyList.begin(); bodyIter != m_BodyList.end(); bodyIter++) bodyIter->second->ComputeDrag();
+
+#endif
 
 #ifndef OUTPUTS_AFTER_SIMULATION_STEP
     if (m_OutputKinematicsFlag && (m_StepCount % m_DisplaySkip) == 0) OutputKinematics();
@@ -1638,6 +1686,35 @@ void Simulation::ParseBody(rapidxml::xml_node<char> * cur)
     buf = DoXmlGetProp(cur, "MaxAngularSpeed");
     if (buf) theBody->SetMaxAngularSpeed(Util::Double(buf));
 
+#ifdef EXPERIMENTAL
+    buf = DoXmlGetProp(cur, "DirectDragCoefficients");
+    if (buf)
+    {
+        Util::Double(buf, 6, m_DoubleList);
+        theBody->SetDirectDragCoefficients(m_DoubleList[0], m_DoubleList[1], m_DoubleList[2], m_DoubleList[3], m_DoubleList[4], m_DoubleList[5]); // 3 rotational then 3 linear
+    }
+    buf = DoXmlGetProp(cur, "DragCylinderAxis");
+    if (buf)
+    {
+        DragControl dragAxis;
+        double dragFluidDensity, dragCylinderMin, dragCylinderMax, dragCylinderRadius, dragCylinderCoefficient;
+        if (strcasecmp(buf, "x") == 0) dragAxis = DragCylinderX;
+        else if (strcasecmp(buf, "y") == 0) dragAxis = DragCylinderY;
+        else if (strcasecmp(buf, "z") == 0) dragAxis = DragCylinderZ;
+        else throw __LINE__;
+        THROWIFZERO(buf = DoXmlGetProp(cur, "DragFluidDensity"));
+        dragFluidDensity = Util::Double(buf);
+        THROWIFZERO(buf = DoXmlGetProp(cur, "DragCylinderMin"));
+        dragCylinderMin = Util::Double(buf);
+        THROWIFZERO(buf = DoXmlGetProp(cur, "DragCylinderMax"));
+        dragCylinderMax = Util::Double(buf);
+        THROWIFZERO(buf = DoXmlGetProp(cur, "DragCylinderRadius"));
+        dragCylinderRadius = Util::Double(buf);
+        THROWIFZERO(buf = DoXmlGetProp(cur, "DragCylinderCoefficient"));
+        dragCylinderCoefficient = Util::Double(buf);
+        theBody->SetCylinderDragParameters(dragAxis, dragFluidDensity, dragCylinderMin, dragCylinderMax, dragCylinderRadius, dragCylinderCoefficient);
+    }
+#endif
 
 #ifdef USE_QT
     if (m_loadMeshFiles)
@@ -2188,6 +2265,17 @@ void Simulation::ParseJoint(rapidxml::xml_node<char> * cur)
             maxTorqueSpecified = true;
         }
 
+#ifdef EXPERIMENTAL
+        buf = DoXmlGetProp(cur, "DynamicFrictionIntercept");
+        if (buf)
+        {
+            THROWIF(maxTorqueSpecified);
+            double dynamicFrictionIntercept = Util::Double(buf);
+            THROWIFZERO(buf = DoXmlGetProp(cur, "DynamicFrictionSlope"));
+            double dynamicFrictionSlope = Util::Double(buf);
+            aMotorJoint->SetDynamicFriction(dynamicFrictionIntercept, dynamicFrictionSlope);
+        }
+#endif
     }
 
     else if (strcmp((const char *)buf, "Slider") == 0)
@@ -3565,6 +3653,22 @@ void Simulation::ParseController(rapidxml::xml_node<char> * cur)
 
 void Simulation::ParseWarehouse(rapidxml::xml_node<char> * cur)
 {
+#ifdef EXPERIMENTAL
+    Warehouse *warehouse = new Warehouse();
+    warehouse->setSimulation(this);
+    int err = warehouse->XMLLoad(cur);
+    if (err)
+    {
+        SetMessage(warehouse->GetMessage());
+        delete warehouse;
+        throw __LINE__;
+        return;
+    }
+
+    warehouse->SetUnitIncreaseThreshold(m_WarehouseUnitIncreaseDistanceThreshold);
+    warehouse->SetUnitDecreaseThresholdFactor(m_WarehouseDecreaseThresholdFactor);
+    m_WarehouseList[*warehouse->GetName()] = warehouse;
+#endif
 }
 
 #ifdef USE_QT
@@ -4593,6 +4697,19 @@ void Simulation::SetGraphicsRoot(const char *filename)
 // add a warehouse from a file
 void Simulation::AddWarehouse(const char *filename)
 {
+#ifdef EXPERIMENTAL
+    Warehouse *warehouse = new Warehouse();
+    WarehouseUnit *warehouseUnit = warehouse->NewWarehouseUnit(0);
+    int err = warehouseUnit->ImportWarehouseUnit(filename, false);
+    if (err)
+    {
+        delete warehouse;
+        return;
+    }
+    warehouse->SetName(filename);
+    m_CurrentWarehouse = filename;
+    m_WarehouseList[filename] = warehouse;
+#endif
 }
 
 bool Simulation::ShouldQuit()
