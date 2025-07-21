@@ -10,6 +10,8 @@
 #ifndef DataTarget_h
 #define DataTarget_h
 
+#include <map>
+
 #include "NamedObject.h"
 
 class Body;
@@ -42,15 +44,14 @@ public:
     virtual double GetError(double time) = 0;
 
     double PositiveFunction(double v);
+    std::map<int, int> *GetTargetTimeIndexes();
 
 #ifdef USE_QT
     virtual void Draw(SimulationWindow *window) = 0;
 #endif
 
+
 protected:
-
-    int ProtectedTargetMatch(double time, double tolerance);
-
     NamedObject *m_Target;
 
     double m_Intercept;
@@ -64,6 +65,7 @@ protected:
     int m_ValueListLength;
 
     int m_LastMatchIndex;
+    std::map<int, int> m_TargetTimeIndexes;
 };
 
 #endif

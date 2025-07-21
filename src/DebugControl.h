@@ -88,6 +88,7 @@ extern std::string gDebugFunctionFilter;
 extern std::string gDebugNameFilter;
 #else
 DebugControl gDebug = NoDebug;
+// DebugControl gDebug = FitnessDebug;
 std::ostream *gDebugStream = &std::cerr;
 std::string gDebugFunctionFilter;
 std::string gDebugNameFilter;

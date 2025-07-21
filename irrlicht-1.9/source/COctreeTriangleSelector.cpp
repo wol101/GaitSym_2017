@@ -24,17 +24,17 @@ COctreeTriangleSelector::COctreeTriangleSelector(const IMesh* mesh,
 
 	if (!Triangles.empty())
 	{
-		const u32 start = os::Timer::getRealTime();
+        // const u32 start = os::Timer::getRealTime();
 
 		// create the triangle octree
 		Root = new SOctreeNode();
 		Root->Triangles = Triangles;
 		constructOctree(Root);
 
-		c8 tmp[256];
-		sprintf(tmp, "Needed %ums to create OctreeTriangleSelector.(%d nodes, %u polys)",
-			os::Timer::getRealTime() - start, NodeCount, Triangles.size());
-		os::Printer::log(tmp, ELL_INFORMATION);
+        // c8 tmp[256];
+        // sprintf(tmp, "Needed %ums to create OctreeTriangleSelector.(%d nodes, %u polys)",
+        // 	os::Timer::getRealTime() - start, NodeCount, Triangles.size());
+        // os::Printer::log(tmp, ELL_INFORMATION);
 	}
 }
 

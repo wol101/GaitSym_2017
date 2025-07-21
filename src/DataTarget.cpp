@@ -13,6 +13,7 @@
 #include <ode/ode.h>
 
 #include "DataTarget.h"
+#include "DebugControl.h"
 #include "Util.h"
 #include "Simulation.h"
 
@@ -49,9 +50,11 @@ void DataTarget::SetTargetTimes(int size, double *targetTimes)
         m_TargetTimeListLength = size;
         m_TargetTimeList = new double[m_TargetTimeListLength];
     }
+    m_TargetTimeIndexes.clear();
     for (i = 0 ; i < m_TargetTimeListLength; i++)
     {
         m_TargetTimeList[i] = targetTimes[i];
+        m_TargetTimeIndexes[int((targetTimes[i] / m_simulation->GetTimeIncrement()) + 0.5)] = i;
     }
 }
 
@@ -76,33 +79,6 @@ void DataTarget::SetTargetValues(int size, double *values)
 }
 
 
-// returns the index if a target match time is triggered
-// the tolerance needs to be lower than the distance between target times
-// returns -1 if no target is found within the tolerance
-int DataTarget::TargetMatch(double time, double tolerance)
-{
-    m_LastMatchIndex = ProtectedTargetMatch(time, tolerance);
-    return m_LastMatchIndex;
-}
-
-int DataTarget::ProtectedTargetMatch(double time, double tolerance)
-{
-    int index = Util::BinarySearchRange(m_TargetTimeList, m_TargetTimeListLength, time);
-    if (index < 0)
-    {
-        if (fabs(m_TargetTimeList[0] - time) <= tolerance) return 0;
-        return -1;
-    }
-    if (index >= m_TargetTimeListLength - 1)
-    {
-        if (fabs(m_TargetTimeList[m_TargetTimeListLength - 1] - time) <= tolerance) return m_TargetTimeListLength - 1;
-        return -1;
-    }
-    if (fabs(m_TargetTimeList[index] - time) <= tolerance) return index;
-    if (fabs(m_TargetTimeList[index + 1] - time) <= tolerance) return index + 1;
-    return -1;
-}
-
 double DataTarget::PositiveFunction(double v)
 {
     switch (m_MatchType)
@@ -117,6 +93,11 @@ double DataTarget::PositiveFunction(double v)
         break;
     }
     return 0;
+}
+
+std::map<int, int> *DataTarget::GetTargetTimeIndexes()
+{
+    return &m_TargetTimeIndexes;
 }
 
 double DataTarget::GetMatchValue(double time)

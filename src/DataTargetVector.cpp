@@ -353,7 +353,8 @@ void DataTargetVector::Draw(SimulationWindow *window)
 
             irr::u32 tesselationCylinder = 64;
             irr::u32 tesselationCone = 128;
-            irr::f32 height = m_AxisSize[0];
+            // irr::f32 height = m_AxisSize[0];
+            irr::f32 height = axisSizeX;
             irr::f32 cylinderHeight = height * (1 - 2 * widthFraction);
             irr::f32 widthCylinder = height * 0.25 * widthFraction;
             irr::f32 widthCone = height * widthFraction * 0.5;

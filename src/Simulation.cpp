@@ -537,12 +537,11 @@ void Simulation::UpdateSimulation()
             std::map<std::string, DataTarget *>::const_iterator iter3;
             for (iter3=m_DataTargetList.begin(); iter3 != m_DataTargetList.end(); iter3++)
             {
-                int lastIndex = iter3->second->GetLastMatchIndex();
-                int index = iter3->second->TargetMatch(m_SimulationTime, m_StepSize * 0.50000000001);
-                // on rare occasions because of rounding we may get two matches we can check this using the lastIndex since this is the only palce where a match is requested
-                if (index != -1 && index != lastIndex) // since step size is much smaller than the interval between targets (probably), this should get called exactly once per target time defintion
+                auto targetTimeIndexes = iter3->second->GetTargetTimeIndexes();
+                auto iter = targetTimeIndexes->find(m_StepCount);
+                if (iter != targetTimeIndexes->end())
                 {
-                    matchScore = iter3->second->GetMatchValue(index);
+                    matchScore = iter3->second->GetMatchValue(iter->second);
                     m_KinematicMatchFitness += matchScore;
                     if (matchScore < minScore)
                         minScore = matchScore;
