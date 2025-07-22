@@ -1,6 +1,12 @@
 # -------------------------------------------------
 # Project created by QtCreator 2009-07-04T17:08:56
 # -------------------------------------------------
+
+!versionAtLeast(QT_VERSION, 6.0.0) {
+    message("Cannot use Qt $${QT_VERSION}")
+    error("Use Qt 6.0 or newer")
+}
+
 VERSION = 2017
 AUTHOR = "Bill Sellers 2017"
 macx {
@@ -91,7 +97,7 @@ else:win32 {
     HEADERS +=
     SOURCES += \
     ../irrlicht-1.9/source/COSOperator.cpp ../irrlicht-1.9/source/Irrlicht.cpp
-    QMAKE_CXXFLAGS += -bigobj -W4
+    QMAKE_CXXFLAGS += -bigobj
 #    QMAKE_CXXFLAGS += -openmp
     QMAKE_CXXFLAGS_DEBUG += -Od -RTCsu
     QMAKE_CXXFLAGS_RELEASE += -Ox -fp:fast -GL
@@ -147,6 +153,7 @@ else:unix {
 OBJECTS_DIR = obj
 QT += opengl xml
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 5): QT += core5compat
 TARGET = GaitSym2017
 TEMPLATE = app
 CONFIG += no_batch # this gets around a bug in Visual Studio with the object_parallel_to_source option

@@ -263,7 +263,7 @@ DialogOutputSelect::DialogOutputSelect(QWidget *parent) :
     buttonBox = new QDialogButtonBox(this);
     QFont buttonBoxFont;
     buttonBoxFont.setBold(false);
-    buttonBoxFont.setWeight(50);
+    buttonBoxFont.setWeight(QFont::Weight::Normal);
     buttonBox->setFont(buttonBoxFont);
     buttonBox->setOrientation(Qt::Horizontal);
     buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);

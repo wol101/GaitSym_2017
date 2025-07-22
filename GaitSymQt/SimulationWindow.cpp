@@ -261,7 +261,7 @@ void SimulationWindow::mousePressEvent(QMouseEvent *event)
             renderLater();
         }
     }
-    else if (event->buttons() & Qt::MidButton)
+    else if (event->buttons() & Qt::MiddleButton)
     {
         if (event->modifiers() == Qt::NoModifier)
         {
@@ -323,7 +323,7 @@ void SimulationWindow::mouseMoveEvent(QMouseEvent *event)
             renderLater();
         }
     }
-    else if (event->buttons() & Qt::MidButton)
+    else if (event->buttons() & Qt::MiddleButton)
     {
         if (m_zoomFlag)
         {
@@ -356,7 +356,7 @@ void SimulationWindow::wheelEvent(QWheelEvent * event)
 {
     // assume each ratchet of the wheel gives a score of 120 (8 * 15 degrees)
     double sensitivity = 2400;
-    double scale = 1.0 + double(event->delta()) / sensitivity;
+    double scale = 1.0 + double(event->angleDelta().y()) / sensitivity;
     m_FOV *= scale;
     if (m_FOV > 170) m_FOV = 170;
     else if (m_FOV < 0.001) m_FOV = 0.001f;

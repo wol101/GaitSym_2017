@@ -2,7 +2,6 @@
 #include <QTimer>
 #include <QFileDialog>
 #include <QBoxLayout>
-#include <QDesktopWidget>
 #include <QListWidgetItem>
 #include <QLineEdit>
 #include <QFile>
@@ -135,7 +134,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // put SimulationWindow into existing widgetGLWidget
     QBoxLayout *boxLayout = new QBoxLayout(QBoxLayout::LeftToRight, ui->widgetGLWidget);
-    boxLayout->setMargin(0);
+    boxLayout->setContentsMargins(0, 0, 0, 0);
     m_simulationWindow = new SimulationWindow();
     QWidget *container = QWidget::createWindowContainer(m_simulationWindow);
     boxLayout->addWidget(container);
@@ -383,7 +382,7 @@ void MainWindow::restart()
 
 void MainWindow::saveas()
 {
-    QFileInfo info = m_preferences->valueQString("LastFileOpened");
+    QFileInfo info(m_preferences->valueQString("LastFileOpened"));
 
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Model State File (Relative)"), info.absolutePath(), tr("Config Files (*.xml)"), 0);
 
@@ -397,7 +396,7 @@ void MainWindow::saveas()
 
 void MainWindow::saveasworld()
 {
-    QFileInfo info = m_preferences->valueQString("LastFileOpened");
+    QFileInfo info(m_preferences->valueQString("LastFileOpened"));
 
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Model State File (World)"), info.absolutePath(), tr("Config Files (*.xml)"), 0);
 
@@ -542,7 +541,7 @@ void MainWindow::snapshot()
     int count = 0;
     QDir dir(configFile.absolutePath());
     QStringList list = dir.entryList(QDir::Files | QDir::Dirs, QDir::Name);
-    QStringList matches = list.filter(QRegExp(QString("^Snapshot\\d\\d\\d\\d\\d.*")));
+    QStringList matches = list.filter(QRegularExpression(QString("^Snapshot\\d\\d\\d\\d\\d.*")));
     if (matches.size() > 0)
     {
         QString numberString = matches.last().mid(8, 5);
@@ -1370,8 +1369,7 @@ void MainWindow::menu1920x1080()
 
 void MainWindow::resizeAndCentre(int w, int h)
 {
-    QDesktopWidget *desktop = qApp->desktop();
-    QRect available = desktop->availableGeometry(-1);
+    QRect available = screen()->availableGeometry();
 
     // Need to find how big the central widget is compared to the window
     int heightDiff = height() - ui->widgetGLWidget->height();
