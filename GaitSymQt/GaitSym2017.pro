@@ -61,6 +61,7 @@ macx {
         message(Release build)
         DEFINES += dNODEBUG
     }
+    QMAKE_APPLE_DEVICE_ARCHS = x86_64 arm64
 }
 
 else:win32 {
